@@ -27,3 +27,4 @@ out
 .idea
 build
 .gradle
+.qodana
