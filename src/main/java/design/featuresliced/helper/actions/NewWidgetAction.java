@@ -1,7 +1,7 @@
 package design.featuresliced.helper.actions;
 
-import design.featuresliced.helper.ui.dialog.NewWidgetDialog;
-import design.featuresliced.helper.util.Notify;
+import design.featuresliced.helper.ui.dialog.slice.NewWidgetDialog;
+import design.featuresliced.helper.util.NotifyUtil;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.util.NlsActions;
@@ -21,7 +21,7 @@ public class NewWidgetAction extends BaseAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         if (e.getProject() == null) {
-            Notify.show(null, "FSD Error", "Project is null", NotificationType.ERROR);
+            NotifyUtil.show(null, "Project is null", NotificationType.ERROR);
         } else {
             new NewWidgetDialog(e.getProject()).show();
         }

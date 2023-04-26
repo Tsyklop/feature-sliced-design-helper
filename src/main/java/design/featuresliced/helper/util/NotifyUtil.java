@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Notify {
+public class NotifyUtil {
 
     private static final String NOTIFICATION_GROUP_ID = "fsd-idea";
 
@@ -40,7 +40,7 @@ public class Notify {
         if (content == null) {
             notificationGroup.createNotification(title, type).notify(project);
         } else {
-            notificationGroup.createNotification(title, content, type).notify(project);
+            notificationGroup.createNotification(title, "", content, type).notify(project);
         }
     }
 

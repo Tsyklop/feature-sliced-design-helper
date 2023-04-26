@@ -16,12 +16,16 @@
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description>
         <![CDATA[
-        Plugin for creating entities, features, pages e.t.c from FSD methodology
+            Plugin for creating slices from Feature Slices Design methodology.
+            You can create Page, Entity, Feature, Widget.
         ]]>
     </description>
 
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>JavaScript</depends>
+    <depends>TypeScript</depends>
+    <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.platform</depends>
 
     <!-- Extension points defined by the plugin.
@@ -37,7 +41,7 @@
 
     <actions>
 
-        <group id="org.intellij.sdk.action.GroupedActions"
+        <group id="design.featuresliced.helper.actions.group.FSDActionsGroup"
                text="Feature Sliced Design"
                class="design.featuresliced.helper.actions.group.FSDActionsGroup"
                popup="true"

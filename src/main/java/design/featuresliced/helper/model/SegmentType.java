@@ -5,7 +5,10 @@ public enum SegmentType {
     UI("ui", "ui.tsx", "ui"),
     API("api", "api.ts", "api"),
     LIB("lib", "lib.ts", "lib"),
-    MODEL("model", "model.ts", "model");
+    TYPE("types", "types.ts", "types"),
+    MODEL("model", "model.ts", "model"),
+    CONFIG("config", "config.ts", "config"),
+    ASSETS("assets", "assets.ts", "assets");
 
     private final String label;
     private final String fileName;

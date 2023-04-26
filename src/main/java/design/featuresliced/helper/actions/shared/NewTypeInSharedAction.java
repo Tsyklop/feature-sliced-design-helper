@@ -1,20 +1,18 @@
-package design.featuresliced.helper.actions;
+package design.featuresliced.helper.actions.shared;
 
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.util.NlsActions;
-import design.featuresliced.helper.ui.dialog.slice.NewPageDialog;
+import design.featuresliced.helper.actions.BaseAction;
+import design.featuresliced.helper.ui.dialog.shared.NewTypeSharedDialog;
 import design.featuresliced.helper.util.NotifyUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class NewPageAction extends BaseAction {
+public class NewTypeInSharedAction extends BaseAction {
 
-    public NewPageAction(@Nullable @NlsActions.ActionText String text,
-                         @Nullable @NlsActions.ActionDescription String description,
-                         @Nullable Icon icon) {
+    public NewTypeInSharedAction(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
         super(text, description, icon);
     }
 
@@ -23,7 +21,7 @@ public class NewPageAction extends BaseAction {
         if (e.getProject() == null) {
             NotifyUtil.show(null, "Project is null", NotificationType.ERROR);
         } else {
-            new NewPageDialog(e.getProject()).show();
+            new NewTypeSharedDialog(e.getProject()).show();
         }
     }
 

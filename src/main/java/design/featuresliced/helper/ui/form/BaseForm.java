@@ -16,20 +16,9 @@ public interface BaseForm {
 
     @Nullable FormError validate(@NotNull VirtualFile baseDir);
 
-    boolean isCreateLibSegment();
-
-    boolean isCreateModelSegment();
-
-    boolean isCreateUiSegment();
-
-    boolean isCreateApiSegment();
-
-    SegmentAsType getUiSegmentAsType();
-
-    SegmentAsType getLibSegmentAsType();
-
-    SegmentAsType getApiSegmentAsType();
-
-    SegmentAsType getModelSegmentAsType();
+    default void removeInsetsAndBorder(JComponent component) {
+        component.getInsets().set(0, 0, 0, 0);
+        component.setBorder(BorderFactory.createEmptyBorder());
+    }
 
 }

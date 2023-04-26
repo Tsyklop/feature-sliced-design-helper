@@ -1,17 +1,18 @@
-package design.featuresliced.helper.actions;
+package design.featuresliced.helper.actions.shared;
 
-import design.featuresliced.helper.ui.dialog.slice.NewEntityDialog;
-import design.featuresliced.helper.util.NotifyUtil;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import design.featuresliced.helper.actions.BaseAction;
+import design.featuresliced.helper.ui.dialog.shared.NewUiSharedDialog;
+import design.featuresliced.helper.util.NotifyUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class NewEntityAction extends BaseAction {
+public class NewUiInSharedAction extends BaseAction {
 
-    public NewEntityAction(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
+    public NewUiInSharedAction(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
         super(text, description, icon);
     }
 
@@ -20,7 +21,7 @@ public class NewEntityAction extends BaseAction {
         if (e.getProject() == null) {
             NotifyUtil.show(null,  "Project is null", NotificationType.ERROR);
         } else {
-            new NewEntityDialog(e.getProject()).show();
+            new NewUiSharedDialog(e.getProject()).show();
         }
     }
 

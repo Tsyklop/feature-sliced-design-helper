@@ -1,6 +1,5 @@
 package design.featuresliced.helper.actions;
 
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.util.NlsActions;
@@ -15,11 +14,6 @@ public abstract class BaseAction extends AnAction {
                            @Nullable @NlsActions.ActionDescription String description,
                            @Nullable Icon icon) {
         super(text, description, icon);
-    }
-
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return super.getActionUpdateThread();
     }
 
     @Override

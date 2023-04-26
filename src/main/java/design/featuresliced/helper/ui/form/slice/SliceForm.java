@@ -1,13 +1,13 @@
-package design.featuresliced.helper.ui.form;
+package design.featuresliced.helper.ui.form.slice;
 
-import design.featuresliced.helper.model.FormErrorType;
-import design.featuresliced.helper.model.SegmentAsType;
-import design.featuresliced.helper.ui.model.FormError;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import design.featuresliced.helper.model.FormErrorType;
+import design.featuresliced.helper.model.SegmentAsType;
+import design.featuresliced.helper.ui.model.FormError;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,7 +17,7 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.nio.file.Path;
 
-public class NewFeatureForm extends BaseForm {
+public class SliceForm implements BaseSliceForm {
 
     private JPanel root;
 
@@ -31,7 +31,8 @@ public class NewFeatureForm extends BaseForm {
     private JComboBox<SegmentAsType> modelSegmentTypeComboBox;
     private JComboBox<SegmentAsType> apiSegmentTypeComboBox;
 
-    public NewFeatureForm() {
+    public SliceForm() {
+        removeInsetsAndBorder(getRoot());
         for (SegmentAsType segmentAsType : SegmentAsType.values()) {
             this.uiSegmentTypeComboBox.addItem(segmentAsType);
             this.libSegmentTypeComboBox.addItem(segmentAsType);
@@ -42,8 +43,6 @@ public class NewFeatureForm extends BaseForm {
         this.libSegmentTypeComboBox.setSelectedItem(SegmentAsType.FILE);
         this.modelSegmentTypeComboBox.setSelectedItem(SegmentAsType.FILE);
         this.apiSegmentTypeComboBox.setSelectedItem(SegmentAsType.FILE);
-        this.root.getInsets().set(0, 0, 0, 0);
-        this.root.setBorder(BorderFactory.createEmptyBorder());
 
         this.createUiSegmentCheckBox.addChangeListener(e -> {
             this.uiSegmentTypeComboBox.setEnabled(((JCheckBox) e.getSource()).isSelected());
@@ -141,52 +140,62 @@ public class NewFeatureForm extends BaseForm {
         return root;
     }
 
+    @Override
     public JPanel getRoot() {
         return root;
     }
 
-    public JTextField getNameTextField() {
-        return nameTextField;
+    @Override
+    public String getName() {
+        return nameTextField.getText();
     }
 
+    @Override
     public boolean isCreateLibSegment() {
         return createLibSegmentCheckBox.isSelected();
     }
 
+    @Override
     public boolean isCreateModelSegment() {
         return createModelSegmentCheckBox.isSelected();
     }
 
+    @Override
     public boolean isCreateUiSegment() {
         return createUiSegmentCheckBox.isSelected();
     }
 
+    @Override
     public boolean isCreateApiSegment() {
         return createApiSegmentCheckBox.isSelected();
     }
 
+    @Override
     public SegmentAsType getUiSegmentAsType() {
         return (SegmentAsType) uiSegmentTypeComboBox.getSelectedItem();
     }
 
+    @Override
     public SegmentAsType getLibSegmentAsType() {
         return (SegmentAsType) libSegmentTypeComboBox.getSelectedItem();
     }
 
+    @Override
     public SegmentAsType getApiSegmentAsType() {
         return (SegmentAsType) apiSegmentTypeComboBox.getSelectedItem();
     }
 
+    @Override
     public SegmentAsType getModelSegmentAsType() {
         return (SegmentAsType) modelSegmentTypeComboBox.getSelectedItem();
     }
 
     @Override
     public @Nullable FormError validate(@NotNull VirtualFile baseDir) {
-        if (StringUtils.isEmpty(this.nameTextField.getText())) {
+        if (StringUtils.isEmpty(getName())) {
             return new FormError(FormErrorType.NAME_INCORRECT, this.nameTextField);
         }
-        if (LocalFileSystem.getInstance().findFileByNioFile(Path.of(baseDir.getPath(), this.nameTextField.getText())) != null) {
+        if (LocalFileSystem.getInstance().findFileByNioFile(Path.of(baseDir.getPath(), getName())) != null) {
             return new FormError(FormErrorType.ALREADY_EXISTS, this.nameTextField);
         }
         if (!this.isCreateApiSegment()

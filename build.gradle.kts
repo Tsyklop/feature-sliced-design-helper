@@ -5,6 +5,7 @@ fun properties(key: String) = providers.gradleProperty(key)
 
 plugins {
     id("java")
+    id("idea")
     id("org.jetbrains.kotlin.jvm") version "1.7.20"
     id("org.jetbrains.intellij") version "1.13.3"
     id("org.jetbrains.changelog") version "2.0.0"
@@ -15,7 +16,7 @@ version = properties("pluginVersion").get()
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(11))
     }
 }
 
@@ -33,12 +34,12 @@ intellij {
     pluginName.set(properties("pluginName"))
     version.set(properties("platformVersion"))
     type.set(properties("platformType"))
+    plugins.set(listOf("JavaScript"))
     updateSinceUntilBuild.set(true)
 }
 
 changelog {
-//    groups.empty()
-    path.set("${project.projectDir}/${properties("pluginRepositoryUrl")}")
+    path.set("${project.projectDir}/${properties("pluginDescriptionPath")}")
     header.set(provider { "[${project.version}] - ${date()}" })
     itemPrefix.set("-")
     unreleasedTerm.set("Unreleased")
@@ -62,17 +63,9 @@ tasks {
         version.set(properties("pluginVersion"))
         sinceBuild.set(properties("pluginSinceBuild"))
 
-        val changelog = project.changelog
-        changeNotes.set(properties("pluginVersion").map { pluginVersion ->
-            with(changelog) {
-                renderItem(
-                        (getOrNull(pluginVersion) ?: getUnreleased())
-                                .withHeader(false)
-                                .withEmptySections(false),
-                        Changelog.OutputType.HTML,
-                )
-            }
-        })
+        /*changeNotes.set(provider {
+            changelog.renderItem(changelog.getAll().values.take(2).last(), Changelog.OutputType.HTML)
+        })*/
 
     }
 
