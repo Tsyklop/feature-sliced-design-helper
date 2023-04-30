@@ -1,12 +1,13 @@
-import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.date
+import org.jetbrains.changelog.Changelog
+import org.jetbrains.changelog.markdownToHTML
 
 fun properties(key: String) = providers.gradleProperty(key)
 
 plugins {
     id("java")
     id("idea")
-    id("org.jetbrains.kotlin.jvm") version "1.7.20"
+    id("org.jetbrains.kotlin.jvm") version "1.8.21"
     id("org.jetbrains.intellij") version "1.13.3"
     id("org.jetbrains.changelog") version "2.0.0"
 }
@@ -35,14 +36,23 @@ intellij {
     version.set(properties("platformVersion"))
     type.set(properties("platformType"))
     plugins.set(listOf("JavaScript"))
-    updateSinceUntilBuild.set(true)
+    //updateSinceUntilBuild.set(true)
 }
 
 changelog {
-    path.set("${project.projectDir}/${properties("pluginDescriptionPath")}")
+    /*path.set("${project.projectDir}/${properties("pluginDescriptionPath")}")
     header.set(provider { "[${project.version}] - ${date()}" })
     itemPrefix.set("-")
-    unreleasedTerm.set("Unreleased")
+    unreleasedTerm.set("Unreleased")*/
+    groups.empty()
+    repositoryUrl.set(properties("pluginRepositoryUrl"))
+}
+
+dependencies {
+    implementation("com.jayway.jsonpath:json-path:2.8.0"){
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
+    //implementation("org.slf4j:slf4j-api:2.0.7")
 }
 
 tasks {
@@ -63,9 +73,31 @@ tasks {
         version.set(properties("pluginVersion"))
         sinceBuild.set(properties("pluginSinceBuild"))
 
-        /*changeNotes.set(provider {
-            changelog.renderItem(changelog.getAll().values.take(2).last(), Changelog.OutputType.HTML)
-        })*/
+        // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
+        pluginDescription.set(providers.fileContents(layout.projectDirectory.file("README.md")).asText.map {
+            val start = "<!-- Plugin description -->"
+            val end = "<!-- Plugin description end -->"
+
+            with (it.lines()) {
+                if (!containsAll(listOf(start, end))) {
+                    throw GradleException("Plugin description section not found in README.md:\n$start ... $end")
+                }
+                subList(indexOf(start) + 1, indexOf(end)).joinToString("\n").let(::markdownToHTML)
+            }
+        })
+
+        val changelog = project.changelog // local variable for configuration cache compatibility
+        // Get the latest available change notes from the changelog file
+        changeNotes.set(properties("pluginVersion").map { pluginVersion ->
+            with(changelog) {
+                renderItem(
+                        (getOrNull(pluginVersion) ?: getUnreleased())
+                                .withHeader(false)
+                                .withEmptySections(false),
+                        Changelog.OutputType.HTML,
+                )
+            }
+        })
 
     }
 

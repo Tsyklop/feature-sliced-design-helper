@@ -6,6 +6,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -14,22 +15,21 @@ import com.intellij.psi.PsiBinaryFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.refactoring.copy.CopyHandler;
-import design.featuresliced.helper.model.ComponentStyleType;
-import design.featuresliced.helper.model.FileLibraryType;
+import design.featuresliced.helper.model.JsLibraryExtensionsType;
+import design.featuresliced.helper.model.JsLibraryType;
 import design.featuresliced.helper.model.SegmentType;
 import design.featuresliced.helper.ui.form.shared.DefaultSharedForm;
 import design.featuresliced.helper.util.FileUtil;
+import design.featuresliced.helper.util.JsLibraryUtil;
 import design.featuresliced.helper.util.NotifyUtil;
-import design.featuresliced.helper.util.SegmentUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
 public class NewApiSharedDialog extends BaseSharedDialog<DefaultSharedForm> {
 
-    public NewApiSharedDialog(@NotNull Project project) {
-        super("New Api", new DefaultSharedForm(), project);
+    public NewApiSharedDialog(@NotNull Project project, @NotNull JsLibraryType jsLibrary) {
+        super("New Api", new DefaultSharedForm(), project, jsLibrary);
         init();
         initValidation();
     }
@@ -37,13 +37,13 @@ public class NewApiSharedDialog extends BaseSharedDialog<DefaultSharedForm> {
     @Override
     protected void doOKAction() {
 
-        final FileLibraryType fileLibrary = FileUtil.determineProjectFileLibrary(project);
+        final String componentName = this.form.getName();
+
+        final VirtualFile projectRoot = ProjectUtil.guessProjectDir(this.project);
+
+        final JsLibraryExtensionsType jsLibraryExtensions = JsLibraryUtil.resolveLibraryExtension(jsLibrary, projectRoot);
 
         CommandProcessor.getInstance().executeCommand(project, () -> {
-
-            final String componentName = this.form.getName();
-
-            final VirtualFile projectRoot = ProjectUtil.guessProjectDir(this.project);
 
             try {
 
@@ -53,28 +53,18 @@ public class NewApiSharedDialog extends BaseSharedDialog<DefaultSharedForm> {
 
                     VirtualFile componentDir = VfsUtil.createDirectoryIfMissing(sharedUiDir, componentName);
 
-                    return FileUtil.createFile(fileLibrary.withUsualExt(componentName), componentDir);
+                    return FileUtil.createFile(jsLibraryExtensions.withUsualExt(componentName), componentDir);
 
                 });
 
-                PsiFile psiComponentFile = PsiManager.getInstance(project).findFile(createdComponentFile);
-
-                psiComponentFile.navigate(true);
+                openInEditorIfSelected(findPsiFileAndNavigate(createdComponentFile));
 
                 NotifyUtil.show(this.project, "UI component created!", NotificationType.INFORMATION);
-
-                if (myCheckBoxDoNotShowDialog != null && myCheckBoxDoNotShowDialog.isSelected()) {
-                    CopyHandler.updateSelectionInActiveProjectView(psiComponentFile, project, true);
-                    if (!(psiComponentFile instanceof PsiBinaryFile)) {
-                        EditorHelper.openInEditor(psiComponentFile);
-                        ToolWindowManager.getInstance(project).activateEditorComponent();
-                    }
-                }
 
                 super.doOKAction();
 
             } catch (IOException e) {
-                NotifyUtil.show(this.project, "Error occurred: " + e.getMessage(), NotificationType.ERROR);
+                Messages.showErrorDialog(project, "Error occurred: " + e.getMessage(), "Feature Sliced Design Error");
             }
 
         }, "Create New Api in Shared Layer", null);

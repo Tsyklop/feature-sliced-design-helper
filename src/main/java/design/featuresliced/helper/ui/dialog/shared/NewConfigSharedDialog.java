@@ -10,10 +10,12 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import design.featuresliced.helper.model.FileLibraryType;
+import design.featuresliced.helper.model.JsLibraryExtensionsType;
+import design.featuresliced.helper.model.JsLibraryType;
 import design.featuresliced.helper.model.SegmentType;
 import design.featuresliced.helper.ui.form.shared.DefaultSharedForm;
 import design.featuresliced.helper.util.FileUtil;
+import design.featuresliced.helper.util.JsLibraryUtil;
 import design.featuresliced.helper.util.NotifyUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,8 +23,8 @@ import java.io.IOException;
 
 public class NewConfigSharedDialog extends BaseSharedDialog<DefaultSharedForm> {
 
-    public NewConfigSharedDialog(@NotNull Project project) {
-        super("New Config", new DefaultSharedForm(), project);
+    public NewConfigSharedDialog(@NotNull Project project, @NotNull JsLibraryType jsLibrary) {
+        super("New Config", new DefaultSharedForm(), project, jsLibrary);
         init();
         initValidation();
     }
@@ -30,13 +32,13 @@ public class NewConfigSharedDialog extends BaseSharedDialog<DefaultSharedForm> {
     @Override
     protected void doOKAction() {
 
-        FileLibraryType fileLibrary = FileUtil.determineProjectFileLibrary(project);
+        final String componentName = this.form.getName();
+
+        final VirtualFile projectRoot = ProjectUtil.guessProjectDir(this.project);
+
+        final JsLibraryExtensionsType jsLibraryExtensions = JsLibraryUtil.resolveLibraryExtension(jsLibrary, projectRoot);
 
         CommandProcessor.getInstance().executeCommand(project, () -> {
-
-            final String componentName = this.form.getName();
-
-            final VirtualFile projectRoot = ProjectUtil.guessProjectDir(this.project);
 
             try {
 
@@ -46,13 +48,11 @@ public class NewConfigSharedDialog extends BaseSharedDialog<DefaultSharedForm> {
 
                     VirtualFile componentDir = VfsUtil.createDirectoryIfMissing(sharedUiDir, componentName);
 
-                    return FileUtil.createFile(fileLibrary.withUsualExt(componentName), componentDir);
+                    return FileUtil.createFile(jsLibraryExtensions.withUsualExt(componentName), componentDir);
 
                 });
 
-                PsiFile psiComponentFile = PsiManager.getInstance(project).findFile(createdComponentFile);
-                psiComponentFile.navigate(true);
-                openInEditorIfSelected(psiComponentFile);
+                openInEditorIfSelected(findPsiFileAndNavigate(createdComponentFile));
 
                 NotifyUtil.show(this.project, "Shared config created!", NotificationType.INFORMATION);
 

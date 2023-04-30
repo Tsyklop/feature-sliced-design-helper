@@ -1,6 +1,5 @@
 package design.featuresliced.helper.ui.dialog.shared;
 
-import com.intellij.ide.util.EditorHelper;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
@@ -9,15 +8,14 @@ import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.psi.PsiBinaryFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.refactoring.copy.CopyHandler;
-import design.featuresliced.helper.model.FileLibraryType;
+import design.featuresliced.helper.model.JsLibraryExtensionsType;
+import design.featuresliced.helper.model.JsLibraryType;
 import design.featuresliced.helper.model.SegmentType;
 import design.featuresliced.helper.ui.form.shared.DefaultSharedForm;
 import design.featuresliced.helper.util.FileUtil;
+import design.featuresliced.helper.util.JsLibraryUtil;
 import design.featuresliced.helper.util.NotifyUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,8 +23,8 @@ import java.io.IOException;
 
 public class NewAssetSharedDialog extends BaseSharedDialog<DefaultSharedForm> {
 
-    public NewAssetSharedDialog(@NotNull Project project) {
-        super("New Asset", new DefaultSharedForm(), project);
+    public NewAssetSharedDialog(@NotNull Project project, @NotNull JsLibraryType jsLibrary) {
+        super("New Asset", new DefaultSharedForm(), project, jsLibrary);
         init();
         initValidation();
     }
@@ -34,13 +32,13 @@ public class NewAssetSharedDialog extends BaseSharedDialog<DefaultSharedForm> {
     @Override
     protected void doOKAction() {
 
-        final FileLibraryType fileLibrary = FileUtil.determineProjectFileLibrary(project);
+        final String componentName = this.form.getName();
+
+        final VirtualFile projectRoot = ProjectUtil.guessProjectDir(this.project);
+
+        final JsLibraryExtensionsType jsLibraryExtensions = JsLibraryUtil.resolveLibraryExtension(jsLibrary, projectRoot);
 
         CommandProcessor.getInstance().executeCommand(project, () -> {
-
-            final String componentName = this.form.getName();
-
-            final VirtualFile projectRoot = ProjectUtil.guessProjectDir(this.project);
 
             try {
 
@@ -50,13 +48,11 @@ public class NewAssetSharedDialog extends BaseSharedDialog<DefaultSharedForm> {
 
                     final VirtualFile componentDir = VfsUtil.createDirectoryIfMissing(sharedUiDir, componentName);
 
-                    return FileUtil.createFile(fileLibrary.withUsualExt(componentName), componentDir);
+                    return FileUtil.createFile(jsLibraryExtensions.withUsualExt(componentName), componentDir);
 
                 });
 
-                PsiFile psiComponentFile = PsiManager.getInstance(project).findFile(createdComponentFile);
-                psiComponentFile.navigate(true);
-                openInEditorIfSelected(psiComponentFile);
+                openInEditorIfSelected(findPsiFileAndNavigate(createdComponentFile));
 
                 NotifyUtil.show(this.project, "Shared Asset created!", NotificationType.INFORMATION);
 

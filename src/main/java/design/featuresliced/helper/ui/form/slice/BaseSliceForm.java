@@ -1,9 +1,12 @@
 package design.featuresliced.helper.ui.form.slice;
 
+import design.featuresliced.helper.model.ComponentStyleType;
 import design.featuresliced.helper.model.SegmentAsType;
 import design.featuresliced.helper.ui.form.BaseForm;
 
 public interface BaseSliceForm extends BaseForm {
+
+    boolean isCreateStyle();
 
     boolean isCreateLibSegment();
 
@@ -20,5 +23,7 @@ public interface BaseSliceForm extends BaseForm {
     SegmentAsType getApiSegmentAsType();
 
     SegmentAsType getModelSegmentAsType();
+
+    ComponentStyleType getStyleType();
 
 }

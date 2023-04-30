@@ -4,7 +4,6 @@ import java.util.Optional;
 
 public enum FsdLayerType {
 
-    SRC("src", "src"),
     APP("app", "App"),
     PAGES("pages", "Page"),
     SHARED("shared", "Shared"),

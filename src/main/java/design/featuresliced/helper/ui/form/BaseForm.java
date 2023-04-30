@@ -1,8 +1,7 @@
 package design.featuresliced.helper.ui.form;
 
-import design.featuresliced.helper.model.SegmentAsType;
-import design.featuresliced.helper.ui.model.FormError;
 import com.intellij.openapi.vfs.VirtualFile;
+import design.featuresliced.helper.ui.model.FormError;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

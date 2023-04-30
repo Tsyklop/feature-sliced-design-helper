@@ -54,8 +54,8 @@ public class UiSharedForm implements BaseSharedForm {
         root.setLayout(new GridLayoutManager(3, 3, new Insets(0, 0, 0, 0), 5, 5));
         root.setAlignmentX(0.5f);
         root.setAlignmentY(0.5f);
-        root.setMinimumSize(new Dimension(-1, 160));
-        root.setName("Test");
+        root.setMinimumSize(new Dimension(-1, 120));
+        root.setName("");
         root.setPreferredSize(new Dimension(-1, -1));
         root.setToolTipText("");
         root.setBorder(IdeBorderFactory.PlainSmallWithIndent.createTitledBorder(BorderFactory.createEmptyBorder(), "", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));

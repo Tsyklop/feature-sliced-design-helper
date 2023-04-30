@@ -1,28 +1,23 @@
 package design.featuresliced.helper.actions.shared;
 
-import com.intellij.notification.NotificationType;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import design.featuresliced.helper.actions.BaseAction;
+import com.intellij.openapi.project.Project;
+import design.featuresliced.helper.model.JsLibraryType;
+import design.featuresliced.helper.ui.dialog.shared.BaseSharedDialog;
 import design.featuresliced.helper.ui.dialog.shared.NewTypeSharedDialog;
-import design.featuresliced.helper.util.NotifyUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class NewTypeInSharedAction extends BaseAction {
+public class NewTypeInSharedAction extends BaseNewInSharedAction {
 
     public NewTypeInSharedAction(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
         super(text, description, icon);
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        if (e.getProject() == null) {
-            NotifyUtil.show(null, "Project is null", NotificationType.ERROR);
-        } else {
-            new NewTypeSharedDialog(e.getProject()).show();
-        }
+    protected @NotNull BaseSharedDialog<?> createDialog(@NotNull Project project, JsLibraryType jsLibrary) {
+        return new NewTypeSharedDialog(project, jsLibrary);
     }
 
 }

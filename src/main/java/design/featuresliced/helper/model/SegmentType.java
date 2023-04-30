@@ -2,22 +2,22 @@ package design.featuresliced.helper.model;
 
 public enum SegmentType {
 
-    UI("ui", "ui.tsx", "ui"),
-    API("api", "api.ts", "api"),
-    LIB("lib", "lib.ts", "lib"),
-    TYPE("types", "types.ts", "types"),
-    MODEL("model", "model.ts", "model"),
-    CONFIG("config", "config.ts", "config"),
-    ASSETS("assets", "assets.ts", "assets");
+    UI("ui", "ui", "ui"),
+    API("api", "api", "api"),
+    LIB("lib", "lib", "lib"),
+    TYPE("types", "types", "types"),
+    MODEL("model", "model", "model"),
+    CONFIG("config", "config", "config"),
+    ASSETS("assets", "assets", "assets");
 
     private final String label;
     private final String fileName;
-    private final String FolderName;
+    private final String folderName;
 
     SegmentType(String label, String fileName, String folderName) {
         this.label = label;
         this.fileName = fileName;
-        FolderName = folderName;
+        this.folderName = folderName;
     }
 
     public String getLabel() {
@@ -29,7 +29,7 @@ public enum SegmentType {
     }
 
     public String getFolderName() {
-        return FolderName;
+        return folderName;
     }
 
 }
