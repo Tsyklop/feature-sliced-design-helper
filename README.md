@@ -1,7 +1,5 @@
-# Feature Slices Design Helper
+Feature Slices Design Helper
 =============
-
-
 
 Introduction
 ------------
@@ -18,6 +16,8 @@ For shared layer you can create next slices: ui, api, assets, config, lib, type 
 
 Supported frontend libraries: [Vue](https://vuejs.org/), [React](https://react.dev/).
 
+Project with monorepo do not supported for now.
+
 Features
 --------
 
@@ -26,7 +26,8 @@ Features
 - Create Pages
 - Create Widgets
 - Create Shared elements
-- Supported styles: Pure CSS, Saas, Inline, CSS Modules, Styled Components
+- Support Storybook
+- Support styles: Pure CSS, Saas, Inline, CSS Modules, Styled Components
 
 <!-- Plugin description end -->
 

@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="design.featuresliced.helper.ui.form.slice.SliceForm">
-  <grid id="27dc6" binding="root" layout-manager="GridLayoutManager" row-count="6" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="5" vgap="0">
+  <grid id="27dc6" binding="root" layout-manager="GridLayoutManager" row-count="5" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="5" vgap="0">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="370" height="250"/>
+      <xy x="20" y="20" width="420" height="250"/>
     </constraints>
     <properties>
       <alignmentX value="0.5"/>
       <alignmentY value="0.5"/>
-      <minimumSize width="370" height="250"/>
+      <minimumSize width="420" height="250"/>
       <name value=""/>
-      <preferredSize width="320" height="250"/>
+      <preferredSize width="420" height="250"/>
       <toolTipText value=""/>
     </properties>
     <border type="empty" title=""/>
     <children>
       <component id="d0602" class="javax.swing.JLabel">
         <constraints>
-          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
             <preferred-size width="161" height="17"/>
           </grid>
         </constraints>
@@ -28,7 +28,7 @@
       </component>
       <component id="b5783" class="javax.swing.JTextField" binding="nameTextField">
         <constraints>
-          <grid row="1" column="1" row-span="1" col-span="2" vsize-policy="7" hsize-policy="7" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="0" column="1" row-span="1" col-span="3" vsize-policy="7" hsize-policy="7" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <margin top="2" left="6" bottom="2" right="6"/>
@@ -36,7 +36,7 @@
       </component>
       <component id="f62ee" class="javax.swing.JCheckBox" binding="createLibSegmentCheckBox" default-binding="true">
         <constraints>
-          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="4" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="4" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
             <preferred-size width="161" height="22"/>
           </grid>
         </constraints>
@@ -47,7 +47,7 @@
       </component>
       <component id="4d415" class="javax.swing.JCheckBox" binding="createApiSegmentCheckBox" default-binding="true">
         <constraints>
-          <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="4" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="4" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
             <preferred-size width="161" height="22"/>
           </grid>
         </constraints>
@@ -58,7 +58,9 @@
       </component>
       <component id="9e4af" class="javax.swing.JComboBox" binding="libSegmentTypeComboBox">
         <constraints>
-          <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="3" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="132" height="30"/>
+          </grid>
         </constraints>
         <properties>
           <enabled value="false"/>
@@ -66,7 +68,9 @@
       </component>
       <component id="44aea" class="javax.swing.JComboBox" binding="apiSegmentTypeComboBox">
         <constraints>
-          <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="4" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="132" height="30"/>
+          </grid>
         </constraints>
         <properties>
           <enabled value="false"/>
@@ -74,7 +78,7 @@
       </component>
       <component id="b50ea" class="javax.swing.JLabel">
         <constraints>
-          <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="as"/>
@@ -82,7 +86,7 @@
       </component>
       <component id="34087" class="javax.swing.JLabel">
         <constraints>
-          <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="as"/>
@@ -90,7 +94,7 @@
       </component>
       <component id="aeaa1" class="javax.swing.JCheckBox" binding="createModelSegmentCheckBox">
         <constraints>
-          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="4" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="4" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
             <preferred-size width="161" height="22"/>
           </grid>
         </constraints>
@@ -101,7 +105,7 @@
       </component>
       <component id="3ff56" class="javax.swing.JLabel">
         <constraints>
-          <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="as"/>
@@ -109,14 +113,16 @@
       </component>
       <component id="699d3" class="javax.swing.JComboBox" binding="modelSegmentTypeComboBox">
         <constraints>
-          <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="2" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="132" height="30"/>
+          </grid>
         </constraints>
         <properties/>
       </component>
       <grid id="cf9d" binding="uiPanel" layout-manager="GridLayoutManager" row-count="2" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
-          <grid row="2" column="0" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="1" column="0" row-span="1" col-span="4" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <name value="UI"/>
@@ -177,22 +183,6 @@
           </component>
         </children>
       </grid>
-      <component id="7311d" class="javax.swing.JLabel">
-        <constraints>
-          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Group:"/>
-        </properties>
-      </component>
-      <component id="7aa4b" class="javax.swing.JComboBox" binding="groupComboBox">
-        <constraints>
-          <grid row="0" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <popupVisible value="false"/>
-        </properties>
-      </component>
     </children>
   </grid>
 </form>

@@ -19,6 +19,7 @@ import design.featuresliced.helper.util.FileTemplateUtil;
 import design.featuresliced.helper.util.FileUtil;
 import design.featuresliced.helper.util.JsLibraryUtil;
 import design.featuresliced.helper.util.NotifyUtil;
+import design.featuresliced.helper.util.PsiUtil;
 import design.featuresliced.helper.util.StyleUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -93,7 +94,7 @@ public class NewUiSharedDialog extends BaseSharedDialog<UiSharedForm> {
 
                 });
 
-                openInEditorIfSelected(findPsiFileAndNavigate(createdComponentFile));
+                openInEditorIfSelected(PsiUtil.findPsiFileAndNavigate(project, createdComponentFile));
 
                 NotifyUtil.show(this.project, "UI component created!", NotificationType.INFORMATION);
 

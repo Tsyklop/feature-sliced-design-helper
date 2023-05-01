@@ -17,6 +17,7 @@ import design.featuresliced.helper.ui.form.shared.DefaultSharedForm;
 import design.featuresliced.helper.util.FileUtil;
 import design.featuresliced.helper.util.JsLibraryUtil;
 import design.featuresliced.helper.util.NotifyUtil;
+import design.featuresliced.helper.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -52,7 +53,7 @@ public class NewConfigSharedDialog extends BaseSharedDialog<DefaultSharedForm> {
 
                 });
 
-                openInEditorIfSelected(findPsiFileAndNavigate(createdComponentFile));
+                openInEditorIfSelected(PsiUtil.findPsiFileAndNavigate(project, createdComponentFile));
 
                 NotifyUtil.show(this.project, "Shared config created!", NotificationType.INFORMATION);
 

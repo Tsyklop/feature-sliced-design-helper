@@ -2,6 +2,7 @@ package design.featuresliced.helper.ui.dialog.slice;
 
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.ui.Messages;
@@ -18,6 +19,7 @@ import design.featuresliced.helper.util.FileTemplateUtil;
 import design.featuresliced.helper.util.FileUtil;
 import design.featuresliced.helper.util.JsLibraryUtil;
 import design.featuresliced.helper.util.NotifyUtil;
+import design.featuresliced.helper.util.PsiUtil;
 import design.featuresliced.helper.util.SegmentUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,81 +47,85 @@ public abstract class BaseSliceDialog<F extends BaseSliceForm> extends BaseDialo
 
         final JsLibraryExtensionsType jsLibraryExtensions = JsLibraryUtil.resolveLibraryExtension(jsLibrary, projectRoot);
 
-        try {
+        CommandProcessor.getInstance().executeCommand(project, () -> {
 
-            VirtualFile createdSliceDir = ApplicationManager.getApplication().runWriteAction((ThrowableComputable<VirtualFile, IOException>) () -> {
+            try {
 
-                VirtualFile fsdLayerDir = VfsUtil.createDirectoryIfMissing(projectRoot, buildPathToLayer());
+                VirtualFile createdSliceDir = ApplicationManager.getApplication().runWriteAction((ThrowableComputable<VirtualFile, IOException>) () -> {
 
-                VirtualFile newSliceDir = FileUtil.createDirectory(sliceName, fsdLayerDir);
+                    VirtualFile fsdLayerDir = VfsUtil.createDirectoryIfMissing(projectRoot, buildPathToLayer());
 
-                if (this.form.isCreateUiSegment()) {
+                    VirtualFile newSliceDir = FileUtil.createDirectory(sliceName, fsdLayerDir);
 
-                    if (this.form.isCreateStyle()) {
-                        SegmentUtil.createUiDependsOnAsTypeWithStyles(
-                                sliceName,
-                                this.form.getUiSegmentAsType(),
-                                this.form.getStyleType(),
-                                jsLibraryExtensions,
-                                newSliceDir
-                        );
-                    } else {
-                        SegmentUtil.createUiDependsOnAsType(sliceName, this.form.getUiSegmentAsType(), jsLibraryExtensions, newSliceDir);
+                    if (this.form.isCreateUiSegment()) {
+
+                        if (this.form.isCreateStyle()) {
+                            SegmentUtil.createUiDependsOnAsTypeWithStyles(
+                                    sliceName,
+                                    this.form.getUiSegmentAsType(),
+                                    this.form.getStyleType(),
+                                    jsLibraryExtensions,
+                                    newSliceDir
+                            );
+                        } else {
+                            SegmentUtil.createUiDependsOnAsType(sliceName, this.form.getUiSegmentAsType(), jsLibraryExtensions, newSliceDir);
+                        }
+
                     }
 
-                }
-
-                if (this.form.isCreateLibSegment()) {
-                    SegmentUtil.createLibDependsOnAsType(this.form.getLibSegmentAsType(), jsLibraryExtensions, newSliceDir);
-                }
-
-                if (this.form.isCreateApiSegment()) {
-                    SegmentUtil.createApiDependsOnAsType(this.form.getApiSegmentAsType(), jsLibraryExtensions, newSliceDir);
-                }
-
-                if (this.form.isCreateModelSegment()) {
-                    SegmentUtil.createModelDependsOnAsType(this.form.getModelSegmentAsType(), jsLibraryExtensions, newSliceDir);
-                }
-
-                String newSliceIndexName = getFsdLayerType() == FsdLayerType.PAGES
-                        ? jsLibraryExtensions.withComponentExt("index")
-                        : jsLibraryExtensions.withUsualExt("index");
-
-                // index.(js|ts|tsx|jsx)
-                VirtualFile newSliceIndexFile = FileUtil.createFile(newSliceIndexName, newSliceDir);
-
-                if (form.isCreateUiSegment()) {
-
-                    String template = null;
-
-                    switch (form.getUiSegmentAsType()) {
-                        case FILE:
-                            template = FileTemplateUtil.uiComponentExportFromFileTemplateBy(jsLibraryExtensions);
-                            break;
-                        case FOLDER:
-                            template = FileTemplateUtil.uiComponentExportFromFolderTemplateBy(jsLibraryExtensions);
-                            break;
+                    if (this.form.isCreateLibSegment()) {
+                        SegmentUtil.createLibDependsOnAsType(this.form.getLibSegmentAsType(), jsLibraryExtensions, newSliceDir);
                     }
 
-                    if (template != null) {
-                        FileUtil.writeContentToFile(newSliceIndexFile, FileTemplateUtil.fillTemplate(template, Map.of("sliceName", sliceName)));
+                    if (this.form.isCreateApiSegment()) {
+                        SegmentUtil.createApiDependsOnAsType(this.form.getApiSegmentAsType(), jsLibraryExtensions, newSliceDir);
                     }
 
-                }
+                    if (this.form.isCreateModelSegment()) {
+                        SegmentUtil.createModelDependsOnAsType(this.form.getModelSegmentAsType(), jsLibraryExtensions, newSliceDir);
+                    }
 
-                return newSliceDir;
+                    String newSliceIndexName = getFsdLayerType() == FsdLayerType.PAGES
+                            ? jsLibraryExtensions.withComponentExt("index")
+                            : jsLibraryExtensions.withUsualExt("index");
 
-            });
+                    // index.(js|ts|tsx|jsx)
+                    VirtualFile newSliceIndexFile = FileUtil.createFile(newSliceIndexName, newSliceDir);
 
-            findPsiFileAndNavigate(createdSliceDir);
+                    if (form.isCreateUiSegment()) {
 
-            NotifyUtil.show(this.project, "Slice '" + sliceName + "' created!", NotificationType.INFORMATION);
+                        String template = null;
 
-            super.doOKAction();
+                        switch (form.getUiSegmentAsType()) {
+                            case FILE:
+                                template = FileTemplateUtil.uiComponentExportFromFileTemplateBy(jsLibraryExtensions);
+                                break;
+                            case FOLDER:
+                                template = FileTemplateUtil.uiComponentExportFromFolderTemplateBy(jsLibraryExtensions);
+                                break;
+                        }
 
-        } catch (IOException e) {
-            Messages.showErrorDialog(project, "Error occurred: " + e.getMessage(), "Feature Sliced Design Error");
-        }
+                        if (template != null) {
+                            FileUtil.writeContentToFile(newSliceIndexFile, FileTemplateUtil.fillTemplate(template, Map.of("sliceName", sliceName)));
+                        }
+
+                    }
+
+                    return newSliceDir;
+
+                });
+
+                PsiUtil.findPsiDirectoryAndNavigate(project, createdSliceDir);
+
+                NotifyUtil.show(this.project, "Slice '" + sliceName + "' created!", NotificationType.INFORMATION);
+
+                super.doOKAction();
+
+            } catch (IOException e) {
+                Messages.showErrorDialog(project, "Error occurred: " + e.getMessage(), "Feature Sliced Design Error");
+            }
+
+        }, "Create slice " + sliceName, null);
 
     }
 

@@ -1,5 +1,9 @@
 package design.featuresliced.helper.ui.form.slice;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.IdeBorderFactory;
@@ -10,6 +14,8 @@ import design.featuresliced.helper.model.ComponentStyleType;
 import design.featuresliced.helper.model.FormErrorType;
 import design.featuresliced.helper.model.SegmentAsType;
 import design.featuresliced.helper.ui.model.FormError;
+import design.featuresliced.helper.ui.model.SliceGroup;
+import design.featuresliced.helper.ui.model.SliceGroupType;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,8 +23,11 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 
 public class SliceForm implements BaseSliceForm {
 
@@ -30,13 +39,13 @@ public class SliceForm implements BaseSliceForm {
     private JCheckBox createModelSegmentCheckBox;
     private JCheckBox createApiSegmentCheckBox;
     private JCheckBox createStylesCheckBox;
+    private JComboBox<SliceGroup> groupComboBox;
     private JComboBox<SegmentAsType> uiSegmentTypeComboBox;
     private JComboBox<SegmentAsType> libSegmentTypeComboBox;
     private JComboBox<SegmentAsType> modelSegmentTypeComboBox;
     private JComboBox<SegmentAsType> apiSegmentTypeComboBox;
     private JComboBox<ComponentStyleType> stylesTypeComboBox;
     private JPanel uiPanel;
-    private JComboBox groupComboBox;
 
     public SliceForm() {
 
@@ -104,54 +113,54 @@ public class SliceForm implements BaseSliceForm {
      */
     private void $$$setupUI$$$() {
         root = new JPanel();
-        root.setLayout(new GridLayoutManager(6, 3, new Insets(0, 0, 0, 0), 5, 0));
+        root.setLayout(new GridLayoutManager(5, 4, new Insets(0, 0, 0, 0), 5, 0));
         root.setAlignmentX(0.5f);
         root.setAlignmentY(0.5f);
-        root.setMinimumSize(new Dimension(370, 250));
+        root.setMinimumSize(new Dimension(420, 250));
         root.setName("");
-        root.setPreferredSize(new Dimension(320, 250));
+        root.setPreferredSize(new Dimension(420, 250));
         root.setToolTipText("");
         root.setBorder(IdeBorderFactory.PlainSmallWithIndent.createTitledBorder(BorderFactory.createEmptyBorder(), "", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         final JLabel label1 = new JLabel();
         label1.setText("Slice Name:");
-        root.add(label1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(161, 17), null, 0, false));
+        root.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(161, 17), null, 0, false));
         nameTextField = new JTextField();
         nameTextField.setMargin(new Insets(2, 6, 2, 6));
-        root.add(nameTextField, new GridConstraints(1, 1, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        root.add(nameTextField, new GridConstraints(0, 1, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         createLibSegmentCheckBox = new JCheckBox();
         createLibSegmentCheckBox.setSelected(false);
         createLibSegmentCheckBox.setText("Create lib segment");
-        root.add(createLibSegmentCheckBox, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(161, 22), null, 0, false));
+        root.add(createLibSegmentCheckBox, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(161, 22), null, 0, false));
         createApiSegmentCheckBox = new JCheckBox();
         createApiSegmentCheckBox.setSelected(false);
         createApiSegmentCheckBox.setText("Create api segment");
-        root.add(createApiSegmentCheckBox, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(161, 22), null, 0, false));
+        root.add(createApiSegmentCheckBox, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(161, 22), null, 0, false));
         libSegmentTypeComboBox = new JComboBox();
         libSegmentTypeComboBox.setEnabled(false);
-        root.add(libSegmentTypeComboBox, new GridConstraints(4, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        root.add(libSegmentTypeComboBox, new GridConstraints(3, 2, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(132, 30), null, 0, false));
         apiSegmentTypeComboBox = new JComboBox();
         apiSegmentTypeComboBox.setEnabled(false);
-        root.add(apiSegmentTypeComboBox, new GridConstraints(5, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        root.add(apiSegmentTypeComboBox, new GridConstraints(4, 2, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(132, 30), null, 0, false));
         final JLabel label2 = new JLabel();
         label2.setText("as");
-        root.add(label2, new GridConstraints(4, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        root.add(label2, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label3 = new JLabel();
         label3.setText("as");
-        root.add(label3, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        root.add(label3, new GridConstraints(4, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         createModelSegmentCheckBox = new JCheckBox();
         createModelSegmentCheckBox.setSelected(true);
         createModelSegmentCheckBox.setText("Create model segment");
-        root.add(createModelSegmentCheckBox, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(161, 22), null, 0, false));
+        root.add(createModelSegmentCheckBox, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(161, 22), null, 0, false));
         final JLabel label4 = new JLabel();
         label4.setText("as");
-        root.add(label4, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        root.add(label4, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         modelSegmentTypeComboBox = new JComboBox();
-        root.add(modelSegmentTypeComboBox, new GridConstraints(3, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        root.add(modelSegmentTypeComboBox, new GridConstraints(2, 2, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(132, 30), null, 0, false));
         uiPanel = new JPanel();
         uiPanel.setLayout(new GridLayoutManager(2, 3, new Insets(0, 0, 0, 0), -1, -1));
         uiPanel.setName("UI");
         uiPanel.setToolTipText("UI");
-        root.add(uiPanel, new GridConstraints(2, 0, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        root.add(uiPanel, new GridConstraints(1, 0, 1, 4, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         uiPanel.setBorder(IdeBorderFactory.PlainSmallWithIndent.createTitledBorder(null, "UI segment", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         createStylesCheckBox = new JCheckBox();
         createStylesCheckBox.setText("Create styles");
@@ -171,12 +180,6 @@ public class SliceForm implements BaseSliceForm {
         uiPanel.add(label6, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         uiSegmentTypeComboBox = new JComboBox();
         uiPanel.add(uiSegmentTypeComboBox, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final JLabel label7 = new JLabel();
-        label7.setText("Group:");
-        root.add(label7, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        groupComboBox = new JComboBox();
-        groupComboBox.setPopupVisible(false);
-        root.add(groupComboBox, new GridConstraints(0, 1, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         label1.setLabelFor(nameTextField);
     }
 
