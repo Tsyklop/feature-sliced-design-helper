@@ -17,12 +17,12 @@ version = properties("pluginVersion").get()
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(17)
 }
 
 repositories {
@@ -36,14 +36,9 @@ intellij {
     version.set(properties("platformVersion"))
     type.set(properties("platformType"))
     plugins.set(listOf("JavaScript"))
-    //updateSinceUntilBuild.set(true)
 }
 
 changelog {
-    /*path.set("${project.projectDir}/${properties("pluginDescriptionPath")}")
-    header.set(provider { "[${project.version}] - ${date()}" })
-    itemPrefix.set("-")
-    unreleasedTerm.set("Unreleased")*/
     groups.empty()
     repositoryUrl.set(properties("pluginRepositoryUrl"))
 }
@@ -56,14 +51,19 @@ dependencies {
 }
 
 tasks {
+
+    wrapper {
+        gradleVersion = properties("gradleVersion").get()
+    }
+
     // Set the JVM compatibility versions
     withType<JavaCompile> {
         options.encoding = "UTF-8"
-        sourceCompatibility = "11"
-        targetCompatibility = "11"
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
     }
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "11"
+        kotlinOptions.jvmTarget = "17"
     }
 
     patchPluginXml {

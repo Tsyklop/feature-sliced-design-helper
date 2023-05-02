@@ -9,8 +9,6 @@ import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
 import design.featuresliced.helper.model.JsLibraryExtensionsType;
 import design.featuresliced.helper.model.JsLibraryType;
 import design.featuresliced.helper.model.SegmentType;
@@ -29,7 +27,7 @@ public class NewUiSharedDialog extends BaseSharedDialog<UiSharedForm> {
 
     public NewUiSharedDialog(@NotNull Project project, @NotNull JsLibraryType jsLibrary) {
         super("New Shared Ui Component", new UiSharedForm(), project, jsLibrary);
-        setDoNotAskOption(new DoNotAskOption.Adapter() {
+        setDoNotAskOption(new com.intellij.openapi.ui.DoNotAskOption.Adapter() {
             @Override
             public void rememberChoice(boolean selected, int exitCode) {
                 PropertiesComponent.getInstance().setValue("NewUiSharedDialog.OpenInEditor", selected, true);

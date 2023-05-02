@@ -40,7 +40,7 @@ public class NotifyUtil {
         if (content == null) {
             notificationGroup.createNotification(title, type).notify(project);
         } else {
-            notificationGroup.createNotification(title, "", content, type).notify(project);
+            notificationGroup.createNotification(title, content, type).notify(project);
         }
     }
 

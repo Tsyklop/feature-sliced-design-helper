@@ -31,6 +31,12 @@ Features
 
 <!-- Plugin description end -->
 
+Supported IDEs
+--------------
+
+**WebStorm** is supported since version 2021.1.    
+**Intellij Ultimate** is supported since version 2021.1.    
+
 Installation
 ------------
 
@@ -44,7 +50,7 @@ Restart IDE.
 Usage
 -----
 
-Create new Entity 
+TODO 
 
-[plugin-website]:      https://plugins.jetbrains.com
+[plugin-website]:      https://plugins.jetbrains.com/plugin/21638-feature-slices-design-helper
 [latest-release]:      https://github.com/Tsyklop/feature-slices-design-helper/releases/latest
