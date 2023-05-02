@@ -40,6 +40,12 @@ intellij {
 
 changelog {
     groups.empty()
+    header.set(provider { "[${version.get()}] - ${date()}" })
+    itemPrefix.set("-")
+    lineSeparator.set("\n")
+    combinePreReleases.set(true)
+    keepUnreleasedSection.set(true)
+    unreleasedTerm.set("[Unreleased]")
     repositoryUrl.set(properties("pluginRepositoryUrl"))
 }
 
@@ -47,7 +53,6 @@ dependencies {
     implementation("com.jayway.jsonpath:json-path:2.8.0"){
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
-    //implementation("org.slf4j:slf4j-api:2.0.7")
 }
 
 tasks {
