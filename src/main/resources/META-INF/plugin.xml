@@ -1,12 +1,12 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
-<idea-plugin>
+<idea-plugin require-restart="true">
 
     <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
     <id>feature-sliced-design-helper</id>
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-    <name>Feature Slices Design Helper</name>
+    <name>Feature-Sliced Design Helper</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor email="tsyklop@gmail.com" url="https://tsyklop.info">Tsyklop</vendor>
@@ -20,12 +20,24 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
+
         <notificationGroup id="fsd-idea"
                            key="notification.group"
                            bundle="messages.FSDBundle"
                            displayType="BALLOON"
                            toolWindowId="Project"
         />
+
+        <projectService serviceImplementation="design.featuresliced.helper.service.ProjectService"/>
+
+        <projectConfigurable id="design.featuresliced.helper.settings.ProjectConfigurable"
+                             instance="design.featuresliced.helper.settings.ProjectConfigurable"
+                             parentId="root"
+                             displayName="Feature-Sliced Design"
+                             nonDefaultProject="true"/>
+
+<!--        <applicationService serviceImplementation="krasa.mavenhelper.MavenHelperApplicationService"/>-->
+
     </extensions>
 
     <actions>

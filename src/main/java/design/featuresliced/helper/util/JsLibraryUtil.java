@@ -8,8 +8,8 @@ import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
-import design.featuresliced.helper.model.JsLibraryExtensionsType;
-import design.featuresliced.helper.model.JsLibraryType;
+import design.featuresliced.helper.model.type.JsLibraryExtensionsType;
+import design.featuresliced.helper.model.type.JsLibraryType;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -31,17 +31,11 @@ public class JsLibraryUtil {
             throw new IllegalArgumentException("Project dir not found");
         }
 
-        VirtualFile packageJsonFile = VfsUtil.findFile(Path.of(projectDir.getPath(), "package.json"), true);
-
-        if (packageJsonFile == null) {
-            throw new IllegalArgumentException("package.json not found in project " + projectDir.getName());
-        }
+        VirtualFile packageJsonFile = getPackageJsonFileOrThrow(projectDir);
 
         try {
 
-            String packageJsonText = VfsUtil.loadText(packageJsonFile);
-
-            DocumentContext documentContext = JsonPath.using(JSPN_PATH_CONFIGURATION).parse(packageJsonText);
+            DocumentContext documentContext = JsonPath.using(JSPN_PATH_CONFIGURATION).parse(VfsUtil.loadText(packageJsonFile));
 
             String reactVersion = documentContext.read("$['dependencies']['react']", String.class);
 
@@ -73,16 +67,53 @@ public class JsLibraryUtil {
             throw new IllegalArgumentException("Project dir not found");
         }
 
+        boolean isTypeScriptUsed = isTypeScriptUsed(projectDir);
+
+        return switch (jsLibraryType) {
+            case VUE -> isTypeScriptUsed ? JsLibraryExtensionsType.TYPESCRIPT_VUE : JsLibraryExtensionsType.USUAL_VUE;
+            case REACT ->
+                    isTypeScriptUsed ? JsLibraryExtensionsType.TYPESCRIPT_REACT : JsLibraryExtensionsType.USUAL_REACT;
+        };
+
+    }
+
+    public static boolean isTypeScriptUsed(@NotNull VirtualFile projectDir) {
+
         VirtualFile tsConfigFile = VfsUtil.findFile(Path.of(projectDir.getPath(), "tsconfig.json"), true);
 
-        switch (jsLibraryType) {
-            case VUE:
-                return tsConfigFile != null ? JsLibraryExtensionsType.TYPESCRIPT_VUE : JsLibraryExtensionsType.USUAL_VUE;
-            case REACT:
-                return tsConfigFile != null ? JsLibraryExtensionsType.TYPESCRIPT_REACT : JsLibraryExtensionsType.USUAL_REACT;
+        if (tsConfigFile != null) {
+            return true;
         }
 
-        throw new IllegalArgumentException("Library Extension type is not recognized in project: " + projectDir.getName());
+        try {
+
+            VirtualFile packageJsonFile = getPackageJsonFileOrThrow(projectDir);
+
+            DocumentContext documentContext = JsonPath.using(JSPN_PATH_CONFIGURATION).parse(VfsUtil.loadText(packageJsonFile));
+
+            String typeScriptVersion = documentContext.read("$['devDependencies']['typescript']", String.class);
+
+            if (typeScriptVersion != null) {
+                return true;
+            }
+
+        } catch (IOException e) {
+            throw new IllegalStateException("Is type script used error : " + e.getMessage());
+        }
+
+        return false;
+
+    }
+
+    public static VirtualFile getPackageJsonFileOrThrow(@NotNull VirtualFile projectDir) {
+
+        VirtualFile packageJsonFile = VfsUtil.findFile(Path.of(projectDir.getPath(), "package.json"), true);
+
+        if (packageJsonFile == null) {
+            throw new IllegalArgumentException("package.json not found in project " + projectDir.getName());
+        }
+
+        return packageJsonFile;
 
     }
 

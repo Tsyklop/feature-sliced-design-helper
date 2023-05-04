@@ -11,7 +11,7 @@ import design.featuresliced.helper.actions.slice.NewEntityAction;
 import design.featuresliced.helper.actions.slice.NewFeatureAction;
 import design.featuresliced.helper.actions.slice.NewPageAction;
 import design.featuresliced.helper.actions.slice.NewWidgetAction;
-import design.featuresliced.helper.model.FsdLayerType;
+import design.featuresliced.helper.model.type.fsd.LayerType;
 import icons.FSDIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +34,7 @@ public class FSDActionsGroup extends ActionGroup {
             return;
         }
 
-        e.getPresentation().setVisible(isSrcFolderOrProjectRoot(project, selectedFile) || FsdLayerType.valueOfOptional(selectedFile.getName().toUpperCase()).isPresent());
+        e.getPresentation().setVisible(isSrcFolderOrProjectRoot(project, selectedFile) || LayerType.valueOfOptional(selectedFile.getName().toUpperCase()).isPresent());
 
     }
 
@@ -57,7 +57,7 @@ public class FSDActionsGroup extends ActionGroup {
             return buildAllActionsArray();
         }
 
-        Optional<FsdLayerType> fsdLayerType = FsdLayerType.valueOfOptional(selectedFile.getName().toUpperCase());
+        Optional<LayerType> fsdLayerType = LayerType.valueOfOptional(selectedFile.getName().toUpperCase());
 
         if (fsdLayerType.isEmpty()) {
             return EMPTY_ACTIONS;

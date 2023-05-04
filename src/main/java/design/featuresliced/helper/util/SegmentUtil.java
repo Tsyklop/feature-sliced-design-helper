@@ -1,10 +1,10 @@
 package design.featuresliced.helper.util;
 
 import com.intellij.openapi.vfs.VirtualFile;
-import design.featuresliced.helper.model.ComponentStyleType;
-import design.featuresliced.helper.model.JsLibraryExtensionsType;
-import design.featuresliced.helper.model.SegmentAsType;
-import design.featuresliced.helper.model.SegmentType;
+import design.featuresliced.helper.model.type.ComponentStyleType;
+import design.featuresliced.helper.model.type.JsLibraryExtensionsType;
+import design.featuresliced.helper.model.type.fsd.SegmentAsType;
+import design.featuresliced.helper.model.type.fsd.SegmentType;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

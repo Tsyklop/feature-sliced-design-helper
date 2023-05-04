@@ -1,7 +1,7 @@
 package design.featuresliced.helper.util;
 
 import com.intellij.openapi.vfs.VirtualFile;
-import design.featuresliced.helper.model.ComponentStyleType;
+import design.featuresliced.helper.model.type.ComponentStyleType;
 
 import java.io.IOException;
 import java.util.Map;
