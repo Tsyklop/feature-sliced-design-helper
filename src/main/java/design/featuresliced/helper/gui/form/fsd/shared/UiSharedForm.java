@@ -1,22 +1,17 @@
 package design.featuresliced.helper.gui.form.fsd.shared;
 
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import design.featuresliced.helper.gui.model.FormError;
 import design.featuresliced.helper.model.type.ComponentStyleType;
 import design.featuresliced.helper.model.type.FormErrorType;
-import design.featuresliced.helper.model.type.fsd.SegmentType;
-import design.featuresliced.helper.gui.model.FormError;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.nio.file.Path;
 import java.util.Arrays;
 
 public class UiSharedForm implements BaseSharedForm {
@@ -108,13 +103,13 @@ public class UiSharedForm implements BaseSharedForm {
     }
 
     @Override
-    public @Nullable FormError validate(@NotNull VirtualFile baseDir) {
+    public @Nullable FormError validate(/*@NotNull VirtualFile baseDir*/) {
         if (StringUtils.isEmpty(getName())) {
             return new FormError(FormErrorType.NAME_INCORRECT, this.componentNameTextField);
         }
-        if (LocalFileSystem.getInstance().findFileByNioFile(Path.of(baseDir.getPath(), SegmentType.UI.getFolderName(), getName())) != null) {
+        /*if (LocalFileSystem.getInstance().findFileByNioFile(Path.of(baseDir.getPath(), SegmentType.UI.getFolderName(), getName())) != null) {
             return new FormError(FormErrorType.ALREADY_EXISTS, this.componentNameTextField);
-        }
+        }*/
         return null;
     }
 

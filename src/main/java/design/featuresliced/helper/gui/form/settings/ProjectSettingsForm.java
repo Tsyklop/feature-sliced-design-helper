@@ -1,21 +1,29 @@
 package design.featuresliced.helper.gui.form.settings;
 
 import com.intellij.ide.actions.OpenProjectFileChooserDescriptor;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectUtil;
+import com.intellij.openapi.ui.ComponentValidator;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.IdeBorderFactory;
+import com.intellij.ui.content.Content;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import design.featuresliced.helper.model.ProjectSettings;
 import design.featuresliced.helper.model.type.fsd.LayerType;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.util.function.Supplier;
 
-public class ProjectSettingsForm implements BaseSettingsForm {
+public class ProjectSettingsForm implements BaseSettingsForm, Disposable {
 
     private final Project project;
 
@@ -33,11 +41,63 @@ public class ProjectSettingsForm implements BaseSettingsForm {
         this.project = project;
 
         this.sourceRootTextField.addBrowseFolderListener(
-                "Select root folder",
+                "Choose custom sources folder",
                 "",
                 project,
-                new OpenProjectFileChooserDescriptor(false, false)
+                new OpenProjectFileChooserDescriptor(false, false).withRoots(ProjectUtil.guessProjectDir(project))
         );
+
+        /*new ComponentValidator(this).withValidator(() -> {
+            String appLayerName = this.appLayerTextField.getText();
+            if (StringUtils.isEmpty(appLayerName)) {
+                return new ValidationInfo("Enter app layer name", this.appLayerTextField);
+            }
+            return null;
+        }).andStartOnFocusLost().installOn(this.appLayerTextField);
+
+        new ComponentValidator(this).withValidator(() -> {
+            String pagesLayerName = this.pagesLayerTextField.getText();
+            if (StringUtils.isEmpty(pagesLayerName)) {
+                return new ValidationInfo("Enter pages layer name", this.pagesLayerTextField);
+            }
+            return null;
+        }).andStartOnFocusLost().installOn(this.pagesLayerTextField);
+
+        new ComponentValidator(this).withValidator(() -> {
+            String sharedLayerName = this.sharedLayerTextField.getText();
+            if (StringUtils.isEmpty(sharedLayerName)) {
+                return new ValidationInfo("Enter shared layer name", this.sharedLayerTextField);
+            }
+            return null;
+        }).andStartOnFocusLost().installOn(this.sharedLayerTextField);
+
+        new ComponentValidator(this).withValidator(() -> {
+            String widgetsLayerName = this.widgetsLayerTextField.getText();
+            if (StringUtils.isEmpty(widgetsLayerName)) {
+                return new ValidationInfo("Enter widgets layer name", this.widgetsLayerTextField);
+            }
+            return null;
+        }).andStartOnFocusLost().installOn(this.widgetsLayerTextField);*/
+
+        /*ComponentValidator componentValidator = new ComponentValidator(this).withValidator(() -> {
+            String appLayerName = this.appLayerTextField.getText();
+            if (StringUtils.isEmpty(appLayerName)) {
+                return new ValidationInfo("Enter app layer name", this.appLayerTextField);
+            }
+            String pagesLayerName = this.pagesLayerTextField.getText();
+            if (StringUtils.isEmpty(pagesLayerName)) {
+                return new ValidationInfo("Enter pages layer name", this.pagesLayerTextField);
+            }
+            String sharedLayerName = this.sharedLayerTextField.getText();
+            if (StringUtils.isEmpty(sharedLayerName)) {
+                return new ValidationInfo("Enter shared layer name", this.sharedLayerTextField);
+            }
+            String widgetsLayerName = this.widgetsLayerTextField.getText();
+            if (StringUtils.isEmpty(widgetsLayerName)) {
+                return new ValidationInfo("Enter widgets layer name", this.widgetsLayerTextField);
+            }
+            return null;
+        }).installOn(this.root);*/
 
     }
 
@@ -65,6 +125,7 @@ public class ProjectSettingsForm implements BaseSettingsForm {
         label1.setText("Source Root:");
         root.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         sourceRootTextField = new TextFieldWithBrowseButton();
+        sourceRootTextField.setEditable(false);
         root.add(sourceRootTextField, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new GridLayoutManager(7, 2, new Insets(0, 0, 0, 0), -1, -1));
@@ -120,7 +181,7 @@ public class ProjectSettingsForm implements BaseSettingsForm {
     }
 
     public String getSourceRoot() {
-        return this.sourceRootTextField.getText().replace(this.project.getBasePath(), "");
+        return this.sourceRootTextField.getText();//.replace(this.project.getBasePath(), "");
     }
 
     public @Nullable String getLayerCustomFolderNameBy(@NotNull LayerType type) {
@@ -165,6 +226,11 @@ public class ProjectSettingsForm implements BaseSettingsForm {
                 || !this.entitiesLayerTextField.getText().equals(settings.getLayerCustomFolderNameBy(LayerType.ENTITIES).orElse(null))
                 || !this.featuresLayerTextField.getText().equals(settings.getLayerCustomFolderNameBy(LayerType.FEATURES).orElse(null))
                 || !this.processesLayerTextField.getText().equals(settings.getLayerCustomFolderNameBy(LayerType.PROCESSES).orElse(null));
+    }
+
+    @Override
+    public void dispose() {
+
     }
 
 }

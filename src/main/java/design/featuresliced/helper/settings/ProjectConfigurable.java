@@ -77,7 +77,10 @@ public class ProjectConfigurable implements SearchableConfigurable {
 
     @Override
     public void disposeUIResources() {
-        this.form = null;
+        if (this.form != null) {
+            this.form.dispose();
+            this.form = null;
+        }
     }
 
 }

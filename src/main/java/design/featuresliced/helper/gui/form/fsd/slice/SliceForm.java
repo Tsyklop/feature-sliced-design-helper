@@ -1,24 +1,20 @@
 package design.featuresliced.helper.gui.form.fsd.slice;
 
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.ui.JBColor;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import design.featuresliced.helper.gui.model.FormError;
+import design.featuresliced.helper.gui.model.SliceGroup;
 import design.featuresliced.helper.model.type.ComponentStyleType;
 import design.featuresliced.helper.model.type.FormErrorType;
 import design.featuresliced.helper.model.type.fsd.SegmentAsType;
-import design.featuresliced.helper.gui.model.FormError;
-import design.featuresliced.helper.gui.model.SliceGroup;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.nio.file.Path;
 import java.util.Arrays;
 
 public class SliceForm implements BaseSliceForm {
@@ -243,13 +239,13 @@ public class SliceForm implements BaseSliceForm {
     }
 
     @Override
-    public @Nullable FormError validate(@NotNull VirtualFile baseDir) {
+    public @Nullable FormError validate(/*@NotNull VirtualFile baseDir*/) {
         if (StringUtils.isEmpty(getName())) {
             return new FormError(FormErrorType.NAME_INCORRECT, this.nameTextField);
         }
-        if (LocalFileSystem.getInstance().findFileByNioFile(Path.of(baseDir.getPath(), getName())) != null) {
+        /*if (LocalFileSystem.getInstance().findFileByNioFile(Path.of(baseDir.getPath(), getName())) != null) {
             return new FormError(FormErrorType.ALREADY_EXISTS, this.nameTextField);
-        }
+        }*/
         if (!this.isCreateApiSegment()
                 && !this.isCreateUiSegment()
                 && !this.isCreateLibSegment()

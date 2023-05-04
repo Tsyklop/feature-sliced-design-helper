@@ -1,29 +1,22 @@
 package design.featuresliced.helper.gui.dialog;
 
 import com.intellij.ide.util.EditorHelper;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
-import com.intellij.openapi.util.ThrowableComputable;
-import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiBinaryFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.refactoring.copy.CopyHandler;
 import design.featuresliced.helper.gui.form.fsd.BaseFsdForm;
 import design.featuresliced.helper.gui.model.FormError;
-import design.featuresliced.helper.model.type.fsd.LayerType;
 import design.featuresliced.helper.model.type.JsLibraryType;
-import design.featuresliced.helper.model.type.fsd.SegmentType;
-import org.apache.commons.lang3.StringUtils;
+import design.featuresliced.helper.model.type.fsd.LayerType;
+import design.featuresliced.helper.service.ProjectService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.io.IOException;
 
 public abstract class BaseDialogWrapper<F extends BaseFsdForm> extends DialogWrapper {
 
@@ -31,9 +24,11 @@ public abstract class BaseDialogWrapper<F extends BaseFsdForm> extends DialogWra
 
     protected final Project project;
 
+    protected final LayerType layerType;
+
     protected final JsLibraryType jsLibrary;
 
-    protected final LayerType layerType;
+    protected ProjectService projectService;
 
     public BaseDialogWrapper(@NotNull String title,
                              @NotNull F form,
@@ -45,6 +40,7 @@ public abstract class BaseDialogWrapper<F extends BaseFsdForm> extends DialogWra
         this.project = project;
         this.jsLibrary = jsLibrary;
         this.layerType = layerType;
+        this.projectService = ProjectService.getInstance(project);
         setTitle(title + " (" + jsLibrary.getLabel() + ")");
     }
 
@@ -68,24 +64,15 @@ public abstract class BaseDialogWrapper<F extends BaseFsdForm> extends DialogWra
         return this.layerType;
     }
 
+    public String getFsdLayerCustomOrDefaultName() {
+        return this.projectService.getState().getLayerCustomFolderNameByOrDefault(getFsdLayerType());
+    }
+
     @Override
     protected @Nullable ValidationInfo doValidate() {
-        try {
-            ApplicationManager.getApplication().runWriteAction((ThrowableComputable<@Nullable ValidationInfo, IOException>) () -> {
-
-                VirtualFile baseDir = VfsUtil.createDirectoryIfMissing(ProjectUtil.guessProjectDir(project), buildPathToLayer());
-
-                FormError formError = this.form.validate(baseDir);
-
-                setOKActionEnabled(formError == null);
-
-                return formError != null ? new ValidationInfo(formError.getType().getMessage(), formError.getComponent()) : null;
-
-            });
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
-        }
-        return null;
+        FormError formError = this.form.validate();
+        setOKActionEnabled(formError == null);
+        return formError != null ? new ValidationInfo(formError.getType().getMessage(), formError.getComponent()) : null;
     }
 
     @Override
@@ -94,23 +81,25 @@ public abstract class BaseDialogWrapper<F extends BaseFsdForm> extends DialogWra
     }
 
     /**
-     * Concat src and layer name with '/'
+     * Concat src and layer name with '/'.
+     * Example: $SOURCES_ROOT$/entities, $SOURCES_ROOT$/features
      * @return path to layer from project root
      */
-    protected String buildPathToLayer() {
+    /*protected String buildPathToLayer(String sourcesRootWithoutProjectDir, String layerName) {
         return StringUtils.joinWith(
                 "/",
-                "src",
-                getFsdLayerType().getName()
+                sourcesRootWithoutProjectDir,
+                layerName
         );
     }
 
     protected String buildPathToSegment(SegmentType segmentType) {
         return StringUtils.joinWith(
+                "/",
                 buildPathToLayer(),
                 segmentType.getFolderName()
         );
-    }
+    }*/
 
     /**
      * Open file in editor if option was selected

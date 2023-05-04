@@ -1,7 +1,5 @@
 package design.featuresliced.helper.util;
 
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jayway.jsonpath.Configuration;
@@ -11,63 +9,71 @@ import com.jayway.jsonpath.Option;
 import design.featuresliced.helper.model.type.JsLibraryExtensionsType;
 import design.featuresliced.helper.model.type.JsLibraryType;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 public class JsLibraryUtil {
+
+    private static final Logger log = LoggerFactory.getLogger(JsLibraryUtil.class);
 
     private static final Configuration JSPN_PATH_CONFIGURATION = Configuration.builder()
             .options(Option.DEFAULT_PATH_LEAF_TO_NULL)
             .build();
 
-    public static JsLibraryType resolveType(@NotNull Project project) {
+   /* public static JsLibraryType resolveType(@NotNull Project project) {
         return resolveType(ProjectUtil.guessProjectDir(project));
-    }
+    }*/
 
-    public static JsLibraryType resolveType(@NotNull VirtualFile projectDir) {
+    public static JsLibraryType resolveType(@NotNull VirtualFile rootDir) {
 
-        if (projectDir == null) {
-            throw new IllegalArgumentException("Project dir not found");
-        }
+        VirtualFile searchDir = rootDir;
 
-        VirtualFile packageJsonFile = getPackageJsonFileOrThrow(projectDir);
+        do {
 
-        try {
+            Optional<VirtualFile> packageJsonFile = getPackageJsonFile(searchDir);
 
-            DocumentContext documentContext = JsonPath.using(JSPN_PATH_CONFIGURATION).parse(VfsUtil.loadText(packageJsonFile));
-
-            String reactVersion = documentContext.read("$['dependencies']['react']", String.class);
-
-            if (reactVersion != null) {
-                return JsLibraryType.REACT;
+            if (packageJsonFile.isEmpty()) {
+                continue;
             }
 
-            String vueVersion = documentContext.read("$['dependencies']['vue']", String.class);
+            try {
 
-            if (vueVersion != null) {
-                return JsLibraryType.VUE;
+                DocumentContext documentContext = JsonPath.using(JSPN_PATH_CONFIGURATION).parse(VfsUtil.loadText(packageJsonFile.get()));
+
+                String reactVersion = documentContext.read("$['dependencies']['react']", String.class);
+
+                if (reactVersion != null) {
+                    return JsLibraryType.REACT;
+                }
+
+                String vueVersion = documentContext.read("$['dependencies']['vue']", String.class);
+
+                if (vueVersion != null) {
+                    return JsLibraryType.VUE;
+                }
+
+            } catch (IOException e) {
+                log.error("Library type recognizing error: " + e.getMessage());
             }
 
-        } catch (IOException e) {
-            throw new IllegalStateException("Library type recognizing error: " + e.getMessage());
-        }
 
-        throw new IllegalArgumentException("Library type is not recognized in project: " + projectDir.getName());
+        } while ((searchDir = searchDir.getParent()) != null);
+
+        throw new IllegalArgumentException("Library type is not recognized in root: " + rootDir.getPath());
 
     }
 
-    public static JsLibraryExtensionsType resolveLibraryExtension(@NotNull JsLibraryType jsLibraryType, @NotNull Project project) {
+    /*public static JsLibraryExtensionsType resolveLibraryExtension(@NotNull JsLibraryType jsLibraryType, @NotNull Project project) {
         return resolveLibraryExtension(jsLibraryType, ProjectUtil.guessProjectDir(project));
-    }
+    }*/
 
-    public static JsLibraryExtensionsType resolveLibraryExtension(@NotNull JsLibraryType jsLibraryType, @NotNull VirtualFile projectDir) {
+    public static JsLibraryExtensionsType resolveLibraryExtension(@NotNull JsLibraryType jsLibraryType, @NotNull VirtualFile rootDir) {
 
-        if (projectDir == null) {
-            throw new IllegalArgumentException("Project dir not found");
-        }
-
-        boolean isTypeScriptUsed = isTypeScriptUsed(projectDir);
+        boolean isTypeScriptUsed = isTypeScriptUsed(rootDir);
 
         return switch (jsLibraryType) {
             case VUE -> isTypeScriptUsed ? JsLibraryExtensionsType.TYPESCRIPT_VUE : JsLibraryExtensionsType.USUAL_VUE;
@@ -77,34 +83,45 @@ public class JsLibraryUtil {
 
     }
 
-    public static boolean isTypeScriptUsed(@NotNull VirtualFile projectDir) {
+    public static boolean isTypeScriptUsed(@NotNull VirtualFile rootDir) {
 
-        VirtualFile tsConfigFile = VfsUtil.findFile(Path.of(projectDir.getPath(), "tsconfig.json"), true);
+        VirtualFile searchDir = rootDir;
 
-        if (tsConfigFile != null) {
-            return true;
-        }
+        do {
 
-        try {
+            VirtualFile tsConfigFile = VfsUtil.findFile(Path.of(searchDir.getPath(), "tsconfig.json"), true);
 
-            VirtualFile packageJsonFile = getPackageJsonFileOrThrow(projectDir);
-
-            DocumentContext documentContext = JsonPath.using(JSPN_PATH_CONFIGURATION).parse(VfsUtil.loadText(packageJsonFile));
-
-            String typeScriptVersion = documentContext.read("$['devDependencies']['typescript']", String.class);
-
-            if (typeScriptVersion != null) {
+            if (tsConfigFile != null) {
                 return true;
             }
 
-        } catch (IOException e) {
-            throw new IllegalStateException("Is type script used error : " + e.getMessage());
-        }
+            try {
+
+                Optional<VirtualFile> packageJsonFile = getPackageJsonFile(searchDir);
+
+                if (packageJsonFile.isEmpty()) {
+                    continue;
+                }
+
+                DocumentContext documentContext = JsonPath.using(JSPN_PATH_CONFIGURATION).parse(VfsUtil.loadText(packageJsonFile.get()));
+
+                String typeScriptVersion = documentContext.read("$['devDependencies']['typescript']", String.class);
+
+                if (typeScriptVersion != null) {
+                    return true;
+                }
+
+            } catch (IOException e) {
+                log.error("Is type script used error : " + e.getMessage());
+            }
+
+        } while ((searchDir = searchDir.getParent()) != null);
 
         return false;
 
     }
 
+    /*@Deprecated
     public static VirtualFile getPackageJsonFileOrThrow(@NotNull VirtualFile projectDir) {
 
         VirtualFile packageJsonFile = VfsUtil.findFile(Path.of(projectDir.getPath(), "package.json"), true);
@@ -115,6 +132,10 @@ public class JsLibraryUtil {
 
         return packageJsonFile;
 
+    }*/
+
+    public static Optional<VirtualFile> getPackageJsonFile(@NotNull VirtualFile projectDir) {
+        return Optional.ofNullable(VfsUtil.findFile(Path.of(projectDir.getPath(), "package.json"), true));
     }
 
 }

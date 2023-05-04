@@ -1,6 +1,7 @@
 package design.featuresliced.helper.actions.group;
 
 import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -12,6 +13,7 @@ import design.featuresliced.helper.actions.slice.NewFeatureAction;
 import design.featuresliced.helper.actions.slice.NewPageAction;
 import design.featuresliced.helper.actions.slice.NewWidgetAction;
 import design.featuresliced.helper.model.type.fsd.LayerType;
+import design.featuresliced.helper.service.ProjectService;
 import icons.FSDIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,6 +23,11 @@ import java.util.Optional;
 public class FSDActionsGroup extends ActionGroup {
 
     private static final AnAction[] EMPTY_ACTIONS = new AnAction[0];
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return super.getActionUpdateThread();
+    }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
@@ -34,7 +41,7 @@ public class FSDActionsGroup extends ActionGroup {
             return;
         }
 
-        e.getPresentation().setVisible(isSrcFolderOrProjectRoot(project, selectedFile) || LayerType.valueOfOptional(selectedFile.getName().toUpperCase()).isPresent());
+        e.getPresentation().setVisible(isSourcesRootOrProjectRoot(project, selectedFile) || LayerType.valueOfOptional(selectedFile.getName().toUpperCase()).isPresent());
 
     }
 
@@ -53,35 +60,26 @@ public class FSDActionsGroup extends ActionGroup {
             return EMPTY_ACTIONS;
         }
 
-        if (isSrcFolderOrProjectRoot(project, selectedFile)) {
+        if (isSourcesRootOrProjectRoot(project, selectedFile)) {
             return buildAllActionsArray();
         }
 
         Optional<LayerType> fsdLayerType = LayerType.valueOfOptional(selectedFile.getName().toUpperCase());
 
-        if (fsdLayerType.isEmpty()) {
-            return EMPTY_ACTIONS;
-        }
-
-        switch (fsdLayerType.get()) {
-            case PAGES:
-                return new AnAction[]{buildCreatePageAction()};
-            case SHARED:
-                return new AnAction[]{buildCreateSharedAction()};
-            case WIDGETS:
-                return new AnAction[]{buildCreateWidgetAction()};
-            case FEATURES:
-                return new AnAction[]{buildCreateFeatureAction()};
-            case ENTITIES:
-                return new AnAction[]{buildCreateEntityAction()};
-        }
-
-        return EMPTY_ACTIONS;
+        return fsdLayerType.map(type -> switch (type) {
+            case PAGES -> new AnAction[]{buildCreatePageAction()};
+            case SHARED -> new AnAction[]{buildCreateSharedAction()};
+            case WIDGETS -> new AnAction[]{buildCreateWidgetAction()};
+            case FEATURES -> new AnAction[]{buildCreateFeatureAction()};
+            case ENTITIES -> new AnAction[]{buildCreateEntityAction()};
+            default -> EMPTY_ACTIONS;
+        }).orElse(EMPTY_ACTIONS);
 
     }
 
-    private boolean isSrcFolderOrProjectRoot(Project project, VirtualFile selectedFile) {
-        return (project.getBasePath() != null && project.getBasePath().equals(selectedFile.getPath())) || selectedFile.getPath().endsWith("src");
+    private boolean isSourcesRootOrProjectRoot(Project project, VirtualFile selectedFile) {
+        return (project.getBasePath() != null && project.getBasePath().equals(selectedFile.getPath()))
+                || ProjectService.getInstance(project).getSourcesRoot().getPath().equals(selectedFile.getPath());
     }
 
     private @NotNull AnAction[] buildAllActionsArray() {
