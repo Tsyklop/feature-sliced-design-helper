@@ -4,26 +4,21 @@ import com.intellij.ide.actions.OpenProjectFileChooserDescriptor;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
-import com.intellij.openapi.ui.ComponentValidator;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.ui.ValidationInfo;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.IdeBorderFactory;
-import com.intellij.ui.content.Content;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
-import design.featuresliced.helper.model.ProjectSettings;
+import com.intellij.uiDesigner.core.Spacer;
+import design.featuresliced.helper.model.settings.ProjectGeneralSettings;
 import design.featuresliced.helper.model.type.fsd.LayerType;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.util.function.Supplier;
 
-public class ProjectSettingsForm implements BaseSettingsForm, Disposable {
+public class GeneralSettingsForm implements BaseSettingsForm, Disposable {
 
     private final Project project;
 
@@ -37,7 +32,7 @@ public class ProjectSettingsForm implements BaseSettingsForm, Disposable {
     private JTextField featuresLayerTextField;
     private JTextField processesLayerTextField;
 
-    public ProjectSettingsForm(Project project) {
+    public GeneralSettingsForm(Project project) {
         this.project = project;
 
         this.sourceRootTextField.addBrowseFolderListener(
@@ -117,20 +112,21 @@ public class ProjectSettingsForm implements BaseSettingsForm, Disposable {
      */
     private void $$$setupUI$$$() {
         root = new JPanel();
-        root.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
-        root.setMaximumSize(new Dimension(-1, 160));
+        root.setLayout(new GridLayoutManager(3, 2, new Insets(0, 0, 0, 0), -1, -1));
+        root.setMaximumSize(new Dimension(-1, 305));
         root.setMinimumSize(new Dimension(400, 305));
-        root.setPreferredSize(new Dimension(-1, -1));
+        root.setPreferredSize(new Dimension(400, 305));
         final JLabel label1 = new JLabel();
         label1.setText("Source Root:");
         root.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         sourceRootTextField = new TextFieldWithBrowseButton();
         sourceRootTextField.setEditable(false);
-        root.add(sourceRootTextField, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        sourceRootTextField.setOpaque(true);
+        root.add(sourceRootTextField, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new GridLayoutManager(7, 2, new Insets(0, 0, 0, 0), -1, -1));
-        root.add(panel1, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        panel1.setBorder(IdeBorderFactory.PlainSmallWithIndent.createTitledBorder(null, "Layers custom name", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
+        root.add(panel1, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel1.setBorder(IdeBorderFactory.PlainSmallWithIndent.createTitledBorder(BorderFactory.createLineBorder(Color.black), "Layers custom name", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         final JLabel label2 = new JLabel();
         label2.setText("App:");
         panel1.add(label2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
@@ -166,6 +162,8 @@ public class ProjectSettingsForm implements BaseSettingsForm, Disposable {
         panel1.add(featuresLayerTextField, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         processesLayerTextField = new JTextField();
         panel1.add(processesLayerTextField, new GridConstraints(6, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        final Spacer spacer1 = new Spacer();
+        root.add(spacer1, new GridConstraints(2, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
     }
 
     /**
@@ -196,7 +194,7 @@ public class ProjectSettingsForm implements BaseSettingsForm, Disposable {
         };
     }
 
-    public void fillFrom(@Nullable ProjectSettings settings) {
+    public void fillFrom(@Nullable ProjectGeneralSettings settings) {
 
         if (settings == null) {
             return;
@@ -214,7 +212,7 @@ public class ProjectSettingsForm implements BaseSettingsForm, Disposable {
 
     }
 
-    public boolean isModified(@Nullable ProjectSettings settings) {
+    public boolean isModified(@Nullable ProjectGeneralSettings settings) {
         if (settings == null) {
             return true;
         }

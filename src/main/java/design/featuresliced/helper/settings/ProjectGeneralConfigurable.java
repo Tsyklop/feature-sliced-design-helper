@@ -4,8 +4,8 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsContexts;
-import design.featuresliced.helper.gui.form.settings.ProjectSettingsForm;
-import design.featuresliced.helper.model.ProjectSettings;
+import design.featuresliced.helper.gui.form.settings.GeneralSettingsForm;
+import design.featuresliced.helper.model.settings.ProjectGeneralSettings;
 import design.featuresliced.helper.model.type.fsd.LayerType;
 import design.featuresliced.helper.service.ProjectService;
 import org.jetbrains.annotations.NonNls;
@@ -14,13 +14,13 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class ProjectConfigurable implements SearchableConfigurable {
+public class ProjectGeneralConfigurable implements SearchableConfigurable {
 
-    private ProjectSettingsForm form;
+    private GeneralSettingsForm form;
 
     private final ProjectService projectService;
 
-    public ProjectConfigurable(Project project) {
+    public ProjectGeneralConfigurable(Project project) {
         this.projectService = ProjectService.getInstance(project);
     }
 
@@ -36,7 +36,7 @@ public class ProjectConfigurable implements SearchableConfigurable {
 
     @Override
     public @Nullable JComponent createComponent() {
-        this.form = new ProjectSettingsForm(this.projectService.getProject());
+        this.form = new GeneralSettingsForm(this.projectService.getProject());
         this.form.fillFrom(this.projectService.getState());
         return this.form.getRoot();
     }
@@ -49,18 +49,18 @@ public class ProjectConfigurable implements SearchableConfigurable {
     @Override
     public void apply() throws ConfigurationException {
 
-        ProjectSettings projectSettings = this.projectService.getState();
+        ProjectGeneralSettings projectGeneralSettings = this.projectService.getState();
 
-        if (projectSettings == null) {
-            projectSettings = new ProjectSettings();
+        if (projectGeneralSettings == null) {
+            projectGeneralSettings = new ProjectGeneralSettings();
         }
 
-        projectSettings.setSourcesFolder(this.form.getSourceRoot());
+        projectGeneralSettings.setSourcesFolder(this.form.getSourceRoot());
 
         for(LayerType type: LayerType.values()) {
             String value = this.form.getLayerCustomFolderNameBy(type);
             if (value != null) {
-                projectSettings.setLayerCustomFolderNameBy(type, value);
+                projectGeneralSettings.setLayerCustomFolderNameBy(type, value);
             }
         }
 

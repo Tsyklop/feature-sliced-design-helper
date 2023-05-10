@@ -30,13 +30,19 @@
 
         <projectService serviceImplementation="design.featuresliced.helper.service.ProjectService"/>
 
-        <projectConfigurable id="design.featuresliced.helper.settings.ProjectConfigurable"
-                             instance="design.featuresliced.helper.settings.ProjectConfigurable"
+        <projectConfigurable id="design.featuresliced.helper.settings.ProjectGeneralConfigurable"
                              parentId="root"
+                             instance="design.featuresliced.helper.settings.ProjectGeneralConfigurable"
                              displayName="Feature-Sliced Design"
-                             nonDefaultProject="true"/>
+                             nonDefaultProject="true">
+            <configurable id="design.featuresliced.helper.settings.ProjectTemplatesConfigurable"
+                          instance="design.featuresliced.helper.settings.ProjectTemplatesConfigurable"
+                          parentId="design.featuresliced.helper.settings"
+                          displayName="Templates"
+                          nonDefaultProject="true"/>
+        </projectConfigurable>
 
-<!--        <applicationService serviceImplementation="krasa.mavenhelper.MavenHelperApplicationService"/>-->
+        <!--        <applicationService serviceImplementation="krasa.mavenhelper.MavenHelperApplicationService"/>-->
 
     </extensions>
 

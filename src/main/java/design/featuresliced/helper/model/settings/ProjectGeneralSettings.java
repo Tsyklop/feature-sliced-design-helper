@@ -1,4 +1,4 @@
-package design.featuresliced.helper.model;
+package design.featuresliced.helper.model.settings;
 
 import design.featuresliced.helper.model.type.fsd.LayerType;
 
@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-public class ProjectSettings {
+public class ProjectGeneralSettings {
 
     private String sourcesFolder;
 
@@ -20,11 +20,11 @@ public class ProjectSettings {
         });
     }
 
-    public ProjectSettings() {
+    public ProjectGeneralSettings() {
 
     }
 
-    public ProjectSettings(String sourcesFolder) {
+    public ProjectGeneralSettings(String sourcesFolder) {
         this.sourcesFolder = sourcesFolder;
     }
 
@@ -60,7 +60,7 @@ public class ProjectSettings {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ProjectSettings that = (ProjectSettings) o;
+        ProjectGeneralSettings that = (ProjectGeneralSettings) o;
         return Objects.equals(sourcesFolder, that.sourcesFolder) && Objects.equals(layerCustomNameByType, that.layerCustomNameByType);
     }
 

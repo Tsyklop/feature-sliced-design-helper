@@ -10,7 +10,7 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import design.featuresliced.helper.gui.dialog.BaseDialogWrapper;
 import design.featuresliced.helper.gui.form.fsd.slice.BaseSliceForm;
-import design.featuresliced.helper.model.ProjectSettings;
+import design.featuresliced.helper.model.settings.ProjectGeneralSettings;
 import design.featuresliced.helper.model.type.JsLibraryExtensionsType;
 import design.featuresliced.helper.model.type.JsLibraryType;
 import design.featuresliced.helper.model.type.fsd.LayerType;
@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 public abstract class BaseSliceDialog<F extends BaseSliceForm> extends BaseDialogWrapper<F> {
 
@@ -44,10 +45,10 @@ public abstract class BaseSliceDialog<F extends BaseSliceForm> extends BaseDialo
 
         ProjectService projectService = ProjectService.getInstance(project);
 
-        ProjectSettings projectSettings = projectService.getState();
+        ProjectGeneralSettings projectGeneralSettings = projectService.getState();
 
-        // user or auth/login-form e.t.c
-        final String[] slicePaths = this.form.getName().split("/");
+        // [user] or [auth, login-form] e.t.c
+        final String[] slicePaths = this.form.getName().replace("\\", "/").split("/");
 
         // user or login-form
         final String sliceName = slicePaths[slicePaths.length - 1];
@@ -64,24 +65,27 @@ public abstract class BaseSliceDialog<F extends BaseSliceForm> extends BaseDialo
 
                 VirtualFile createdSliceDir = ApplicationManager.getApplication().runWriteAction((ThrowableComputable<VirtualFile, IOException>) () -> {
 
-                    // $SOURCES_ROOT$/entities or $SOURCES_ROOT$/@entities
+                    // $SOURCES_ROOT$/entities or $SOURCES_ROOT$/<custom name>
                     VirtualFile fsdLayerDir = VfsUtil.createDirectoryIfMissing(
                             sourcesRoot,
-                            projectSettings.getLayerCustomFolderNameByOrDefault(getFsdLayerType())
+                            projectGeneralSettings.getLayerCustomFolderNameByOrDefault(getFsdLayerType())
                     );
 
                     VirtualFile newSliceDir = null;
 
                     if (slicePaths.length > 1) {
                         for (String path: slicePaths) {
-                            if (newSliceDir == null) {
-                                newSliceDir = FileUtil.createDirectory(path, fsdLayerDir);
+
+                            VirtualFile pathFile = fsdLayerDir.findChild(path);
+
+                            if (pathFile != null) {
+                                newSliceDir = pathFile;
                             } else {
-                                newSliceDir = FileUtil.createDirectory(path, newSliceDir);
+                                newSliceDir = FileUtil.createDirectory(path, Objects.requireNonNullElse(newSliceDir, fsdLayerDir));
                             }
                         }
                     } else {
-                        // $SOURCES_ROOT$/entities/user  or $SOURCES_ROOT$/@entities/user
+                        // $SOURCES_ROOT$/entities/user or $SOURCES_ROOT$/<custom name>/user
                         newSliceDir = FileUtil.createDirectory(sliceName, fsdLayerDir);
                     }
 

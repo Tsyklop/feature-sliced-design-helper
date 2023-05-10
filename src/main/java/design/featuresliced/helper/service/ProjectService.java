@@ -7,15 +7,15 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import design.featuresliced.helper.model.ProjectSettings;
+import design.featuresliced.helper.model.settings.ProjectGeneralSettings;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 
 @State(name = "FeatureSlicedDesign", storages = {@Storage("feature-sliced-design.xml")})
-public final class ProjectService implements PersistentStateComponent<ProjectSettings> {
+public final class ProjectService implements PersistentStateComponent<ProjectGeneralSettings> {
 
-    private ProjectSettings settings;
+    private ProjectGeneralSettings settings;
 
     private final Project project;
 
@@ -31,15 +31,15 @@ public final class ProjectService implements PersistentStateComponent<ProjectSet
     }
 
     @Override
-    public @NotNull ProjectSettings getState() {
+    public @NotNull ProjectGeneralSettings getState() {
         if (settings == null) {
-            settings = new ProjectSettings(this.project.getBasePath() + "/src");
+            settings = new ProjectGeneralSettings(this.project.getBasePath() + "/src");
         }
         return settings;
     }
 
     @Override
-    public void loadState(@NotNull ProjectSettings settings) {
+    public void loadState(@NotNull ProjectGeneralSettings settings) {
         this.settings = settings;
     }
 

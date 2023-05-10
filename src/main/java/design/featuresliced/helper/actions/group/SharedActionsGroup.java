@@ -3,10 +3,12 @@ package design.featuresliced.helper.actions.group;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.util.NlsActions;
 import design.featuresliced.helper.actions.shared.NewApiInSharedAction;
 import design.featuresliced.helper.actions.shared.NewAssetInSharedAction;
 import design.featuresliced.helper.actions.shared.NewConfigInSharedAction;
+import design.featuresliced.helper.actions.shared.NewCustomInSharedAction;
 import design.featuresliced.helper.actions.shared.NewLibInSharedAction;
 import design.featuresliced.helper.actions.shared.NewTypeInSharedAction;
 import design.featuresliced.helper.actions.shared.NewUiInSharedAction;
@@ -29,6 +31,8 @@ public class SharedActionsGroup extends DefaultActionGroup {
                 new NewConfigInSharedAction("config", "Create in config slice", FSDIcons.MAIN_ICON),
                 new NewAssetInSharedAction("asset", "Create in asset slice", FSDIcons.MAIN_ICON),
                 new NewTypeInSharedAction("TS type", "Create in type slice", FSDIcons.MAIN_ICON),
+                Separator.getInstance(),
+                new NewCustomInSharedAction("Custom", "", FSDIcons.MAIN_ICON)
         };
     }
 
