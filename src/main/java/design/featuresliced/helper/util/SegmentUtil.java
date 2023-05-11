@@ -1,7 +1,7 @@
 package design.featuresliced.helper.util;
 
 import com.intellij.openapi.vfs.VirtualFile;
-import design.featuresliced.helper.model.type.ComponentStyleType;
+import design.featuresliced.helper.model.type.StyleType;
 import design.featuresliced.helper.model.type.JsLibraryExtensionsType;
 import design.featuresliced.helper.model.type.fsd.SegmentAsType;
 import design.featuresliced.helper.model.type.fsd.SegmentType;
@@ -40,7 +40,7 @@ public final class SegmentUtil {
 
     public static void createUiDependsOnAsTypeWithStyles(@NotNull String sliceName,
                                                          @NotNull SegmentAsType asType,
-                                                         @NotNull ComponentStyleType styleType,
+                                                         @NotNull StyleType styleType,
                                                          @NotNull JsLibraryExtensionsType jsLibraryExtensions,
                                                          @NotNull VirtualFile parent) throws IOException {
         VirtualFile uiFile = null;

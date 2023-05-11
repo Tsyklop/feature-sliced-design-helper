@@ -36,4 +36,15 @@ public abstract class BaseTemplateStructureSettingsAction extends BaseSettingsAc
         }
     }
 
+    protected void insertNodeToTree(@NotNull TemplateStructureNode node) {
+
+        DefaultMutableTreeNode parentNode = getParentNode();
+
+        DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(node);
+
+        treeModel.insertNodeInto(childNode, parentNode, parentNode.getChildCount());
+        tree.scrollPathToVisible(new TreePath(childNode.getPath()));
+
+    }
+
 }

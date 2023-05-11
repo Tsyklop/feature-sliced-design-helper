@@ -8,8 +8,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 public class Template {
+
+    private String uuid;
 
     private String name;
 
@@ -17,29 +21,44 @@ public class Template {
 
     private TemplateStatusType status;
 
-    private List<TemplateStructureNode> nodes;
+    private TemplateStructureNode rootNode;
+
+    public Template() {
+    }
 
     public Template(@NotNull String name) {
-        this(name, null, new ArrayList<>());
+        this(name, null);
     }
 
     public Template(@NotNull String name, @Nullable LayerType layer) {
-        this(name, layer, TemplateStatusType.NEW, new ArrayList<>());
+        this(name, layer, TemplateStatusType.NEW, null);
     }
 
     public Template(@NotNull String name, @Nullable LayerType layer, @NotNull TemplateStatusType status) {
-        this(name, layer, status, new ArrayList<>());
+        this(name, layer, status, null);
     }
 
-    public Template(@NotNull String name, @Nullable LayerType layer, @Nullable List<TemplateStructureNode> nodes) {
-        this(name, layer, TemplateStatusType.NEW, nodes);
+    public Template(@NotNull String name, @Nullable LayerType layer, @Nullable TemplateStructureNode rootNode) {
+        this(name, layer, TemplateStatusType.NEW, rootNode);
     }
 
-    public Template(@NotNull String name, @Nullable LayerType layer, @NotNull TemplateStatusType status, @Nullable List<TemplateStructureNode> nodes) {
+    public Template(@NotNull String name, @Nullable LayerType layer, @NotNull TemplateStatusType status, @Nullable TemplateStructureNode rootNode) {
         this.name = name;
         this.layer = layer;
-        this.nodes = nodes;
         this.status = status;
+        this.rootNode = rootNode;
+    }
+
+    public static Template createTemplate(@NotNull String name, @Nullable LayerType layer) {
+        return new Template(name, layer, TemplateStatusType.NEW).setUuid();
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getName() {
@@ -54,8 +73,17 @@ public class Template {
     public LayerType getLayer() {
         return layer;
     }
+
+    public void setLayer(LayerType layer) {
+        this.layer = layer;
+    }
+
     public TemplateStatusType getStatus() {
         return status;
+    }
+
+    public void setStatus(TemplateStatusType status) {
+        this.status = status;
     }
 
     public void changeStatusToSavedIfPossible() {
@@ -72,8 +100,44 @@ public class Template {
         this.status = TemplateStatusType.CHANGED;
     }
 
-    public List<TemplateStructureNode> getNodes() {
-        return nodes;
+    public boolean isNew() {
+        return this.status == TemplateStatusType.NEW;
     }
 
+    public boolean isChanged() {
+        return this.status == TemplateStatusType.CHANGED;
+    }
+
+    public boolean isNewOrChanged() {
+        return isNew() || isChanged();
+    }
+
+    public TemplateStructureNode getRootNode() {
+        return rootNode;
+    }
+
+    public void setRootNode(TemplateStructureNode rootNode) {
+        this.rootNode = rootNode;
+    }
+
+    private Template setUuid() {
+        if (this.uuid != null) {
+            throw new IllegalStateException();
+        }
+        this.uuid = UUID.randomUUID().toString();
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Template template = (Template) o;
+        return Objects.equals(uuid, template.uuid) && Objects.equals(name, template.name) && layer == template.layer && status == template.status && Objects.equals(rootNode, template.rootNode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuid, name, layer, status, rootNode);
+    }
 }

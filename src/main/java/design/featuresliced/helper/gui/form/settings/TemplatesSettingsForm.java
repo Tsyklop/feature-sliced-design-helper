@@ -91,6 +91,20 @@ public class TemplatesSettingsForm {
                         || template.getStatus() == TemplateStatusType.CHANGED);
     }
 
+    public java.util.List<Template> getNewTemplates() {
+        return this.templatesListModel.getItems()
+                .stream()
+                .filter(Template::isNew)
+                .toList();
+    }
+
+    public java.util.List<Template> getNewOrChangedTemplates() {
+        return this.templatesListModel.getItems()
+                .stream()
+                .filter(Template::isNewOrChanged)
+                .toList();
+    }
+
     private void createUIComponents() {
 
         // TODO: place custom component creation code here
@@ -156,11 +170,7 @@ public class TemplatesSettingsForm {
                         return;
                     }
 
-                    Template newTemplate = new Template(
-                            dialog.getName(),
-                            (LayerType) this.layersComboBox.getSelectedItem(),
-                            TemplateStatusType.NEW
-                    );
+                    Template newTemplate = Template.createTemplate(dialog.getName(), (LayerType) this.layersComboBox.getSelectedItem());
 
                     this.templatesListModel.add(newTemplate);
 
@@ -203,13 +213,9 @@ public class TemplatesSettingsForm {
     }
 
     private void fillForm(LayerType selectedLayer) {
-
-        Set<Template> layerTemplates = this.projectTemplatesService.getState().getTemplatesBy(selectedLayer);
-
-        for (Template template : layerTemplates) {
+        for (Template template : this.projectTemplatesService.getState().getTemplatesBy(selectedLayer)) {
             templatesListModel.add(template);
         }
-
     }
 
     private void resetRightPanel() {

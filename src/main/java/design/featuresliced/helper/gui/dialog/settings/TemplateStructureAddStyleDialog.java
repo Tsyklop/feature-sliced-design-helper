@@ -2,18 +2,19 @@ package design.featuresliced.helper.gui.dialog.settings;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import design.featuresliced.helper.gui.form.settings.structure.TemplateStructureAddFolderForm;
+import design.featuresliced.helper.gui.form.settings.structure.TemplateStructureAddWithNameAndTypeForm;
+import design.featuresliced.helper.model.type.FileExtensionType;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
 public class TemplateStructureAddStyleDialog extends DialogWrapper {
 
-    private final TemplateStructureAddFolderForm form;
+    private final TemplateStructureAddWithNameAndTypeForm form;
 
     public TemplateStructureAddStyleDialog(@Nullable Project project) {
         super(project, false);
-        this.form = new TemplateStructureAddFolderForm();
+        this.form = new TemplateStructureAddWithNameAndTypeForm(FileExtensionType.FOR_STYLES);
         init();
         initValidation();
         setTitle("Add style to structure");
@@ -21,6 +22,10 @@ public class TemplateStructureAddStyleDialog extends DialogWrapper {
 
     public String getName() {
         return this.form.getNameTextField().getText();
+    }
+
+    public FileExtensionType getType() {
+        return (FileExtensionType) this.form.getExtensionComboBox().getSelectedItem();
     }
 
     @Override

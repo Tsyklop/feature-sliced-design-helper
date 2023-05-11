@@ -26,12 +26,7 @@ public class CreateFileTemplateStructureSettingsAction extends BaseTemplateStruc
             return;
         }
 
-        DefaultMutableTreeNode parentNode = getParentNode();
-
-        DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(TemplateStructureNode.fileNode(dialog.getName(), dialog.getExtensionType()));
-
-        treeModel.insertNodeInto(childNode, parentNode, parentNode.getChildCount());
-        tree.scrollPathToVisible(new TreePath(childNode.getPath()));
+        insertNodeToTree(TemplateStructureNode.fileNode(dialog.getName(), dialog.getExtensionType()));
 
     }
 

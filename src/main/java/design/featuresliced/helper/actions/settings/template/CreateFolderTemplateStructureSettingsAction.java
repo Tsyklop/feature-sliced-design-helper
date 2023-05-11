@@ -26,12 +26,7 @@ public class CreateFolderTemplateStructureSettingsAction extends BaseTemplateStr
             return;
         }
 
-        DefaultMutableTreeNode parentNode = getParentNode();
-
-        DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(TemplateStructureNode.folderNode(dialog.getName()));
-
-        treeModel.insertNodeInto(childNode, parentNode, parentNode.getChildCount());
-        tree.scrollPathToVisible(new TreePath(childNode.getPath()));
+        insertNodeToTree(TemplateStructureNode.folderNode(dialog.getName()));
 
     }
 

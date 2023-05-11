@@ -6,7 +6,7 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import design.featuresliced.helper.gui.model.FormError;
 import design.featuresliced.helper.gui.model.SliceGroup;
-import design.featuresliced.helper.model.type.ComponentStyleType;
+import design.featuresliced.helper.model.type.StyleType;
 import design.featuresliced.helper.model.type.FormErrorType;
 import design.featuresliced.helper.model.type.fsd.SegmentAsType;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +32,7 @@ public class SliceForm implements BaseSliceForm {
     private JComboBox<SegmentAsType> libSegmentTypeComboBox;
     private JComboBox<SegmentAsType> modelSegmentTypeComboBox;
     private JComboBox<SegmentAsType> apiSegmentTypeComboBox;
-    private JComboBox<ComponentStyleType> stylesTypeComboBox;
+    private JComboBox<StyleType> stylesTypeComboBox;
     private JPanel uiPanel;
 
     public SliceForm() {
@@ -49,7 +49,7 @@ public class SliceForm implements BaseSliceForm {
             this.apiSegmentTypeComboBox.addItem(segmentAsType);
         }
 
-        Arrays.stream(ComponentStyleType.values()).forEach(this.stylesTypeComboBox::addItem);
+        Arrays.stream(StyleType.values()).forEach(this.stylesTypeComboBox::addItem);
 
         this.uiSegmentTypeComboBox.setSelectedItem(SegmentAsType.FILE);
         this.libSegmentTypeComboBox.setSelectedItem(SegmentAsType.FILE);
@@ -234,8 +234,8 @@ public class SliceForm implements BaseSliceForm {
     }
 
     @Override
-    public ComponentStyleType getStyleType() {
-        return (ComponentStyleType) this.stylesTypeComboBox.getSelectedItem();
+    public StyleType getStyleType() {
+        return (StyleType) this.stylesTypeComboBox.getSelectedItem();
     }
 
     @Override

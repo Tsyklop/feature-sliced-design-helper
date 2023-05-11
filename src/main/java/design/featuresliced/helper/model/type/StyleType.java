@@ -3,7 +3,7 @@ package design.featuresliced.helper.model.type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public enum ComponentStyleType {
+public enum StyleType {
 
     CSS("CSS", ".css", "import './[[name]][[ext]]';", "[[name]][[ext]]"),
     SCSS("Saas", ".scss", "import './[[name]][[ext]]';", "[[name]][[ext]]"),
@@ -19,7 +19,7 @@ public enum ComponentStyleType {
     private final String importTemplate;
     private final String fileNameTemplate;
 
-    ComponentStyleType(@NotNull String label, @Nullable String extension, @NotNull String importTemplate, @NotNull String fileNameTemplate) {
+    StyleType(@NotNull String label, @Nullable String extension, @NotNull String importTemplate, @NotNull String fileNameTemplate) {
         this.label = label;
         this.extension = extension;
         this.importTemplate = importTemplate;

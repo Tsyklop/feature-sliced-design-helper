@@ -18,9 +18,13 @@ public class TemplateStructureNode {
 
     private FileExtensionType extensionType;
 
-    private final List<TemplateStructureNode> nodes;
+    private List<TemplateStructureNode> nodes;
 
-    private final @NotNull TemplateStructureNodeType nodeType;
+    private TemplateStructureNodeType nodeType;
+
+    public TemplateStructureNode() {
+        this("", TemplateStructureNodeType.ROOT);
+    }
 
     public TemplateStructureNode(@NotNull String name,
                                  @NotNull TemplateStructureNodeType nodeType) {
@@ -43,18 +47,33 @@ public class TemplateStructureNode {
         this.extensionType = extensionType;
     }
 
-    public static TemplateStructureNode fileNode(String name, FileExtensionType extensionType) {
-        return new TemplateStructureNode(
+    public static TemplateStructureNode fileNode(@NotNull String name, @NotNull FileExtensionType extensionType) {
+        return createNode(
                 name,
                 extensionType,
                 TemplateStructureNodeType.FILE
         );
     }
 
-    public static TemplateStructureNode folderNode(String name) {
+    public static TemplateStructureNode styleNode(@NotNull String name, @NotNull FileExtensionType extensionType) {
+        return createNode(
+                name,
+                extensionType,
+                TemplateStructureNodeType.STYLE
+        );
+    }
+
+    public static TemplateStructureNode folderNode(@NotNull String name) {
+        return createNode(name, null, TemplateStructureNodeType.FOLDER);
+    }
+
+    private static TemplateStructureNode createNode(@NotNull String name,
+                                                    @Nullable FileExtensionType extensionType,
+                                                    @NotNull TemplateStructureNodeType type) {
         return new TemplateStructureNode(
                 name,
-                TemplateStructureNodeType.FOLDER
+                extensionType,
+                type
         );
     }
 
@@ -94,6 +113,18 @@ public class TemplateStructureNode {
         this.nodes.remove(node);
     }
 
+    public void setExtensionType(FileExtensionType extensionType) {
+        this.extensionType = extensionType;
+    }
+
+    public void setNodes(List<TemplateStructureNode> nodes) {
+        this.nodes = nodes;
+    }
+
+    public void setNodeType(TemplateStructureNodeType nodeType) {
+        this.nodeType = nodeType;
+    }
+
     @Override
     public String toString() {
         return name + getExtensionIfNodeFile().orElse("");
@@ -103,6 +134,20 @@ public class TemplateStructureNode {
         if (!nodeType.isFile()) {
             return Optional.empty();
         }
-        return Optional.of(extensionType != null ? extensionType.getValue() : "");
+        return Optional.of(extensionType != null ? String.join(",", extensionType.getValues()) : "");
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TemplateStructureNode that = (TemplateStructureNode) o;
+        return Objects.equals(name, that.name) && Objects.equals(template, that.template) && extensionType == that.extensionType && Objects.equals(nodes, that.nodes) && nodeType == that.nodeType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, template, extensionType, nodes, nodeType);
+    }
+
 }

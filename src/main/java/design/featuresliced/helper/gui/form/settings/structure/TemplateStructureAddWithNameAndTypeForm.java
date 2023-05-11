@@ -7,18 +7,18 @@ import design.featuresliced.helper.model.type.FileExtensionType;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
+import java.util.Set;
 
-public class TemplateStructureAddFileForm {
+public class TemplateStructureAddWithNameAndTypeForm {
     private JPanel root;
     private JTextField nameTextField;
     private JComboBox<FileExtensionType> extensionComboBox;
 
-
-    public TemplateStructureAddFileForm() {
-        this.extensionComboBox.setRenderer(SimpleListCellRenderer.create((label, value, index) -> label.setText(value != null ? value.getLabel() : null)));
-        Arrays.stream(FileExtensionType.values()).forEach(this.extensionComboBox::addItem);
-        this.extensionComboBox.setSelectedItem(FileExtensionType.AUTO);
+    public TemplateStructureAddWithNameAndTypeForm(Set<FileExtensionType> extensionTypes) {
+        this.extensionComboBox.setRenderer(SimpleListCellRenderer.create((label, value, index) -> {
+            label.setText(value != null ? value.toString() : null);
+        }));
+        extensionTypes.forEach(this.extensionComboBox::addItem);
     }
 
     {
@@ -39,7 +39,7 @@ public class TemplateStructureAddFileForm {
         root = new JPanel();
         root.setLayout(new GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
         final JLabel label1 = new JLabel();
-        label1.setText("Name");
+        label1.setText("Name:");
         root.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         nameTextField = new JTextField();
         root.add(nameTextField, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
@@ -61,4 +61,5 @@ public class TemplateStructureAddFileForm {
     public JComboBox<FileExtensionType> getExtensionComboBox() {
         return extensionComboBox;
     }
+
 }

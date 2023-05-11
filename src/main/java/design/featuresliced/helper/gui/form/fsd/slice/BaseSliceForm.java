@@ -1,7 +1,7 @@
 package design.featuresliced.helper.gui.form.fsd.slice;
 
 import design.featuresliced.helper.gui.form.fsd.BaseFsdForm;
-import design.featuresliced.helper.model.type.ComponentStyleType;
+import design.featuresliced.helper.model.type.StyleType;
 import design.featuresliced.helper.model.type.fsd.SegmentAsType;
 
 public interface BaseSliceForm extends BaseFsdForm {
@@ -24,6 +24,6 @@ public interface BaseSliceForm extends BaseFsdForm {
 
     SegmentAsType getModelSegmentAsType();
 
-    ComponentStyleType getStyleType();
+    StyleType getStyleType();
 
 }

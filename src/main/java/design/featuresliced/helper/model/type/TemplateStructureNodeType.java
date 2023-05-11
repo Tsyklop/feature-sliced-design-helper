@@ -4,10 +4,11 @@ public enum TemplateStructureNodeType {
 
     ROOT,
     FILE,
+    STYLE,
     FOLDER;
 
     public boolean isFile() {
-        return this == FILE;
+        return this == FILE || this == STYLE;
     }
 
 }

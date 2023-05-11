@@ -4,7 +4,7 @@ import com.intellij.ui.IdeBorderFactory;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import design.featuresliced.helper.gui.model.FormError;
-import design.featuresliced.helper.model.type.ComponentStyleType;
+import design.featuresliced.helper.model.type.StyleType;
 import design.featuresliced.helper.model.type.FormErrorType;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -20,11 +20,11 @@ public class UiSharedForm implements BaseSharedForm {
     private JTextField componentNameTextField;
     private JCheckBox createStyleCheckBox;
     private JCheckBox createStorybookCheckBox;
-    private JComboBox<ComponentStyleType> styleTypeComboBox;
+    private JComboBox<StyleType> styleTypeComboBox;
 
     public UiSharedForm() {
         removeInsetsAndBorder(getRoot());
-        Arrays.stream(ComponentStyleType.values()).forEach(this.styleTypeComboBox::addItem);
+        Arrays.stream(StyleType.values()).forEach(this.styleTypeComboBox::addItem);
         this.createStyleCheckBox.addChangeListener(e -> {
             this.styleTypeComboBox.setEnabled(((JCheckBox) e.getSource()).isSelected());
         });
@@ -94,8 +94,8 @@ public class UiSharedForm implements BaseSharedForm {
         return this.createStyleCheckBox.isSelected();
     }
 
-    public ComponentStyleType getStyleType() {
-        return (ComponentStyleType) this.styleTypeComboBox.getSelectedItem();
+    public StyleType getStyleType() {
+        return (StyleType) this.styleTypeComboBox.getSelectedItem();
     }
 
     public boolean isCreateStoryBook() {

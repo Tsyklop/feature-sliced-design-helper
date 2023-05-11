@@ -5,12 +5,15 @@ import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsContexts;
 import design.featuresliced.helper.gui.form.settings.TemplatesSettingsForm;
+import design.featuresliced.helper.model.settings.ProjectTemplatesSettings;
+import design.featuresliced.helper.model.settings.templates.Template;
 import design.featuresliced.helper.service.ProjectTemplatesService;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.List;
 
 public class ProjectTemplatesConfigurable implements SearchableConfigurable {
 
@@ -29,7 +32,7 @@ public class ProjectTemplatesConfigurable implements SearchableConfigurable {
 
     @Override
     public @NlsContexts.ConfigurableName String getDisplayName() {
-        return "Feature-Sliced Design";
+        return "Feature-Sliced Design Templates";
     }
 
     @Override
@@ -47,22 +50,13 @@ public class ProjectTemplatesConfigurable implements SearchableConfigurable {
     @Override
     public void apply() throws ConfigurationException {
 
-        /*ProjectSettings projectSettings = this.projectService.getState();
+        List<Template> newTemplates = this.form.getNewTemplates();
 
-        if (projectSettings == null) {
-            projectSettings = new ProjectSettings();
+        for (Template newOrTemplate : newTemplates) {
+            this.projectTemplatesService.getState().addTemplate(newOrTemplate);
         }
 
-        projectSettings.setSourcesFolder(this.form.getSourceRoot());
-
-        for(LayerType type: LayerType.values()) {
-            String value = this.form.getLayerCustomFolderNameBy(type);
-            if (value != null) {
-                projectSettings.setLayerCustomFolderNameBy(type, value);
-            }
-        }*/
-
-        //this.projectService.loadState(projectSettings);
+        this.projectTemplatesService.getState().markAllTemplatesAsSaved();
 
     }
 

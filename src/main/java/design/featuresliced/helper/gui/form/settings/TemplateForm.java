@@ -346,6 +346,7 @@ public class TemplateForm {
                     if (node.getUserObject() instanceof TemplateStructureNode structureNode) {
                         switch (structureNode.getNodeType()) {
                             case FILE -> setIcon(AllIcons.FileTypes.Text);
+                            case STYLE -> setIcon(AllIcons.FileTypes.Css);
                             case ROOT, FOLDER -> setIcon(PlatformIcons.FOLDER_ICON);
                         }
                     }
@@ -362,8 +363,6 @@ public class TemplateForm {
         structureTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
         structureTree.getSelectionModel().addTreeSelectionListener(e -> {
-
-            // TODO
 
             if (this.templateDocumentListener != null) {
                 this.editorTextField.getDocument().removeDocumentListener(this.templateDocumentListener);
@@ -453,7 +452,16 @@ public class TemplateForm {
 
             this.detailsComponent.setText(this.template.getName() + " template");
 
-            this.structureTreeModel.setRoot(new DefaultMutableTreeNode(new TemplateStructureNode("<layerName>", TemplateStructureNodeType.ROOT)));
+            if (this.template.isNew()) {
+                this.template.setRootNode(new TemplateStructureNode("<layerName>", TemplateStructureNodeType.ROOT));
+            }
+
+            DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(this.template.getRootNode());
+
+            populateNodesTree(rootNode, this.template.getRootNode().getNodes());
+
+            this.structureTreeModel.setRoot(rootNode);
+
 
         } else {
             this.detailsComponent.setText("New template");
@@ -464,6 +472,16 @@ public class TemplateForm {
     private void resetFileTemplatePanelAndDisableToolbarButtons() {
         this.detailsComponent.setContent(null);
         toggleToolbarButtons(false);
+    }
+
+    private void populateNodesTree(DefaultMutableTreeNode rootNode, java.util.List<TemplateStructureNode> nodes) {
+
+        for (TemplateStructureNode node: nodes) {
+            DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(node);
+            populateNodesTree(treeNode, node.getNodes());
+            rootNode.add(treeNode);
+        }
+
     }
 
 }
