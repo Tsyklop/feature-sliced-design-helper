@@ -12,7 +12,7 @@ import design.featuresliced.helper.gui.form.fsd.BaseFsdForm;
 import design.featuresliced.helper.gui.model.FormError;
 import design.featuresliced.helper.model.type.JsLibraryType;
 import design.featuresliced.helper.model.type.fsd.LayerType;
-import design.featuresliced.helper.service.ProjectService;
+import design.featuresliced.helper.service.ProjectGeneralService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +28,7 @@ public abstract class BaseDialogWrapper<F extends BaseFsdForm> extends DialogWra
 
     protected final JsLibraryType jsLibrary;
 
-    protected ProjectService projectService;
+    protected ProjectGeneralService projectGeneralService;
 
     public BaseDialogWrapper(@NotNull String title,
                              @NotNull F form,
@@ -40,7 +40,7 @@ public abstract class BaseDialogWrapper<F extends BaseFsdForm> extends DialogWra
         this.project = project;
         this.jsLibrary = jsLibrary;
         this.layerType = layerType;
-        this.projectService = ProjectService.getInstance(project);
+        this.projectGeneralService = ProjectGeneralService.getInstance(project);
         setTitle(title + " (" + jsLibrary.getLabel() + ")");
     }
 
@@ -65,7 +65,7 @@ public abstract class BaseDialogWrapper<F extends BaseFsdForm> extends DialogWra
     }
 
     public String getFsdLayerCustomOrDefaultName() {
-        return this.projectService.getState().getLayerCustomFolderNameByOrDefault(getFsdLayerType());
+        return this.projectGeneralService.getState().getLayerCustomFolderNameByOrDefault(getFsdLayerType());
     }
 
     @Override

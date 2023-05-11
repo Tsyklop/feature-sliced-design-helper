@@ -13,7 +13,7 @@ import design.featuresliced.helper.actions.slice.NewFeatureAction;
 import design.featuresliced.helper.actions.slice.NewPageAction;
 import design.featuresliced.helper.actions.slice.NewWidgetAction;
 import design.featuresliced.helper.model.type.fsd.LayerType;
-import design.featuresliced.helper.service.ProjectService;
+import design.featuresliced.helper.service.ProjectGeneralService;
 import icons.FSDIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -79,7 +79,7 @@ public class FSDActionsGroup extends ActionGroup {
 
     private boolean isSourcesRootOrProjectRoot(Project project, VirtualFile selectedFile) {
         return (project.getBasePath() != null && project.getBasePath().equals(selectedFile.getPath()))
-                || ProjectService.getInstance(project).getSourcesRoot().getPath().equals(selectedFile.getPath());
+                || ProjectGeneralService.getInstance(project).getSourcesRoot().getPath().equals(selectedFile.getPath());
     }
 
     private @NotNull AnAction[] buildAllActionsArray() {

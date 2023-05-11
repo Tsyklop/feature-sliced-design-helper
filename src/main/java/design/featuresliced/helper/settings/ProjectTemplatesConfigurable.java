@@ -5,7 +5,7 @@ import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsContexts;
 import design.featuresliced.helper.gui.form.settings.TemplatesSettingsForm;
-import design.featuresliced.helper.service.ProjectService;
+import design.featuresliced.helper.service.ProjectTemplatesService;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,15 +16,15 @@ public class ProjectTemplatesConfigurable implements SearchableConfigurable {
 
     private TemplatesSettingsForm form;
 
-    private final ProjectService projectService;
+    private final ProjectTemplatesService projectTemplatesService;
 
     public ProjectTemplatesConfigurable(Project project) {
-        this.projectService = ProjectService.getInstance(project);
+        this.projectTemplatesService = ProjectTemplatesService.getInstance(project);
     }
 
     @Override
     public @NotNull @NonNls String getId() {
-        return "design.featuresliced.helper.settings.ProjectConfigurable";
+        return "design.featuresliced.helper.settings.ProjectTemplatesConfigurable";
     }
 
     @Override
@@ -34,15 +34,14 @@ public class ProjectTemplatesConfigurable implements SearchableConfigurable {
 
     @Override
     public @Nullable JComponent createComponent() {
-        this.form = new TemplatesSettingsForm(this.projectService.getProject());
+        this.form = new TemplatesSettingsForm(this.projectTemplatesService.getProject());
         //this.form.fillFrom(this.projectService.getState());
         return this.form.$$$getRootComponent$$$();
     }
 
     @Override
     public boolean isModified() {
-//        return this.form.isModified(this.projectService.getState());
-        return false;
+        return this.form.isModified();
     }
 
     @Override

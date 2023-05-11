@@ -13,7 +13,7 @@ import design.featuresliced.helper.model.type.JsLibraryExtensionsType;
 import design.featuresliced.helper.model.type.JsLibraryType;
 import design.featuresliced.helper.model.type.fsd.LayerType;
 import design.featuresliced.helper.model.type.fsd.SegmentType;
-import design.featuresliced.helper.service.ProjectService;
+import design.featuresliced.helper.service.ProjectGeneralService;
 import design.featuresliced.helper.util.FileUtil;
 import design.featuresliced.helper.util.JsLibraryUtil;
 import design.featuresliced.helper.util.NotifyUtil;
@@ -35,11 +35,11 @@ public abstract class BaseSharedDialog<F extends BaseSharedForm> extends BaseDia
     @Override
     protected void doOKAction() {
 
-        ProjectService projectService = ProjectService.getInstance(project);
+        ProjectGeneralService projectGeneralService = ProjectGeneralService.getInstance(project);
 
         final String componentName = this.form.getName();
 
-        final VirtualFile sourcesRoot = projectService.getSourcesRoot();
+        final VirtualFile sourcesRoot = projectGeneralService.getSourcesRoot();
 
         final JsLibraryExtensionsType jsLibraryExtensions = JsLibraryUtil.resolveLibraryExtension(jsLibrary, sourcesRoot);
 

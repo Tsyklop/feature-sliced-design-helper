@@ -12,8 +12,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 
-@State(name = "FeatureSlicedDesign", storages = {@Storage("feature-sliced-design.xml")})
-public final class ProjectService implements PersistentStateComponent<ProjectGeneralSettings> {
+@State(name = "FeatureSlicedDesignGeneral", storages = {@Storage("feature-sliced-design/general.xml")})
+public final class ProjectGeneralService implements PersistentStateComponent<ProjectGeneralSettings> {
 
     private ProjectGeneralSettings settings;
 
@@ -21,13 +21,13 @@ public final class ProjectService implements PersistentStateComponent<ProjectGen
 
     private final VirtualFile projectRoot;
 
-    public ProjectService(Project project) {
+    public ProjectGeneralService(Project project) {
         this.project = project;
         this.projectRoot = ProjectUtil.guessProjectDir(project);
     }
 
-    public static ProjectService getInstance(Project project) {
-        return project.getService(ProjectService.class);
+    public static ProjectGeneralService getInstance(Project project) {
+        return project.getService(ProjectGeneralService.class);
     }
 
     @Override

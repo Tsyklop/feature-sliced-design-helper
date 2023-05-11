@@ -1,39 +1,39 @@
 package design.featuresliced.helper.gui.form.settings;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.lang.annotation.Annotator;
+import com.intellij.lang.javascript.JavaScriptFileType;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbarPosition;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorBundle;
-import com.intellij.openapi.editor.EditorCoreUtil;
-import com.intellij.openapi.editor.EditorFactory;
-import com.intellij.openapi.editor.EditorKind;
-import com.intellij.openapi.editor.actionSystem.EditorActionManager;
-import com.intellij.openapi.editor.highlighter.FragmentedEditorHighlighter;
-import com.intellij.openapi.editor.impl.EditorImpl;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
+import com.intellij.openapi.editor.impl.DocumentImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DetailsComponent;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
 import com.intellij.ui.AnActionButton;
+import com.intellij.ui.EditorTextField;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.OnePixelSplitter;
-import com.intellij.ui.SimpleListCellRenderer;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.util.PlatformIcons;
+import com.intellij.util.ui.JBUI;
 import design.featuresliced.helper.actions.group.TemplateStructureCreateActionGroup;
+import design.featuresliced.helper.gui.dialog.settings.TemplateStructureEditNodeNameDialog;
+import design.featuresliced.helper.gui.dialog.settings.confirm.TemplateStructureNodeDeleteConfirmDialog;
 import design.featuresliced.helper.model.settings.templates.Template;
 import design.featuresliced.helper.model.settings.templates.structure.TemplateStructureNode;
 import design.featuresliced.helper.model.type.TemplateStructureNodeType;
-import design.featuresliced.helper.model.type.fsd.LayerType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -42,25 +42,25 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
-import java.util.Arrays;
+import java.util.Optional;
 
 public class TemplateForm {
+
+    private static final Logger log = Logger.getInstance(TemplateForm.class);
 
     private final Project project;
 
     private final Template template;
 
-    private final DefaultTreeModel structureTreeModel;
-
-    private final EditorFactory editorFactory;
+    private final EditorTextField editorTextField;
 
     private final DetailsComponent detailsComponent;
+
+    private final DefaultTreeModel structureTreeModel;
 
     private Tree structureTree;
 
     private JPanel root;
-
-    private Editor fileEditor;
 
     private JBSplitter splitter;
 
@@ -68,25 +68,46 @@ public class TemplateForm {
 
     private JTextField nameTextField;
 
-    private JComboBox<LayerType> layerComboBox;
-
     private AnActionButton toolbarAddActionButton;
+
+    private AnActionButton toolbarEditActionButton;
 
     private AnActionButton toolbarRemoveActionButton;
 
-    public TemplateForm(@NotNull Project project, @Nullable Template template) {
+    private DocumentListener templateDocumentListener;
+
+    public TemplateForm(@NotNull Project project, @NotNull Template template) {
         this.project = project;
         this.template = template;
-        this.editorFactory = EditorFactory.getInstance();
-        this.detailsComponent = new DetailsComponent(true, true);
+
+        this.editorTextField = new EditorTextField(project, JavaScriptFileType.INSTANCE) {
+            @Override
+            protected boolean shouldHaveBorder() {
+                return false;
+            }
+        };
+
+        this.detailsComponent = new DetailsComponent(false, true);
         this.structureTreeModel = new DefaultTreeModel(null);
 
         $$$setupUI$$$();
 
-        this.layerComboBox.setRenderer(
-                SimpleListCellRenderer.create((label, value, index) -> label.setText(value != null ? value.getLabel() : null))
-        );
-        Arrays.stream(LayerType.values()).forEach(this.layerComboBox::addItem);
+        this.nameTextField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                template.setName(nameTextField.getText());
+            }
+
+        });
 
         this.detailsComponent.setContent(null);
         this.detailsComponent.setEmptyContentText("Select node from structure");
@@ -106,25 +127,19 @@ public class TemplateForm {
     private void $$$setupUI$$$() {
         createUIComponents();
         root = new JPanel();
-        root.setLayout(new GridLayoutManager(3, 2, new Insets(0, 0, 0, 0), -1, -1));
+        root.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
         root.setMinimumSize(new Dimension(-1, -1));
         root.setOpaque(true);
         root.setPreferredSize(new Dimension(-1, -1));
         final JLabel label1 = new JLabel();
-        label1.setText("Layer:");
+        label1.setText("Name:");
         root.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final JLabel label2 = new JLabel();
-        label2.setText("Name:");
-        root.add(label2, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        layerComboBox = new JComboBox();
-        layerComboBox.setName("layers");
-        root.add(layerComboBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         nameTextField = new JTextField();
         nameTextField.setName("templateName");
-        root.add(nameTextField, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        root.add(nameTextField, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        root.add(panel1, new GridConstraints(2, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        root.add(panel1, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         splitter.setName("templateSplitter");
         panel1.add(splitter, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
     }
@@ -152,54 +167,78 @@ public class TemplateForm {
         return nameTextField;
     }
 
-    public LayerType getLayer() {
-        return (LayerType) getLayerComboBox().getSelectedItem();
-    }
-
-    public JComboBox<LayerType> getLayerComboBox() {
-        return layerComboBox;
-    }
-
     private void createUIComponents() {
 
-        this.splitter = new OnePixelSplitter(0.2F);
+        this.splitter = new OnePixelSplitter(0.3F);
 
-        /*this.treeModel.addTreeModelListener(new TreeModelListener() {
+        this.structureTreeModel.addTreeModelListener(new TreeModelListener() {
+
             @Override
             public void treeNodesChanged(TreeModelEvent e) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) (e.getTreePath().getLastPathComponent());
-                try {
-                    int index = e.getChildIndices()[0];
-                    node = (DefaultMutableTreeNode) (node.getChildAt(index));
-                } catch (NullPointerException exc) {
-                }
-
-                System.out.println("The user has finished editing the node.");
-                System.out.println("New value: " + node.getUserObject());
             }
 
             @Override
             public void treeNodesInserted(TreeModelEvent e) {
 
+                DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) e.getTreePath().getLastPathComponent();
+
+                if (parentNode == null) {
+                    log.warn("node is null");
+                    return;
+                }
+
+                TemplateStructureNode templateStructureParentNode = (TemplateStructureNode) parentNode.getUserObject();
+
+                if (templateStructureParentNode == null) {
+                    log.warn("templateStructureNode is null");
+                    return;
+                }
+
+                templateStructureParentNode.addNode((TemplateStructureNode) ((DefaultMutableTreeNode) e.getChildren()[0]).getUserObject());
+
+                template.changeStatusToChangedIfPossible();
+
             }
 
             @Override
             public void treeNodesRemoved(TreeModelEvent e) {
+                log.info("treeNodesRemoved: " + e);
+
+                DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) e.getTreePath().getLastPathComponent();
+
+                if (parentNode == null) {
+                    log.warn("node is null");
+                    return;
+                }
+
+                TemplateStructureNode templateStructureParentNode = (TemplateStructureNode) parentNode.getUserObject();
+
+                if (templateStructureParentNode == null) {
+                    log.warn("templateStructureNode is null");
+                    return;
+                }
+
+                templateStructureParentNode.removeNode((TemplateStructureNode) ((DefaultMutableTreeNode) e.getChildren()[0]).getUserObject());
+
+                template.changeStatusToChangedIfPossible();
 
             }
 
             @Override
             public void treeStructureChanged(TreeModelEvent e) {
-
             }
-        });*/
+
+        });
 
         this.structureTree = initStructureTree(this.structureTreeModel);
 
         this.toolbarPanel = initToolbarPanel(this.structureTree);
 
         this.toolbarAddActionButton = ToolbarDecorator.findAddButton(this.toolbarPanel);
+        this.toolbarEditActionButton = ToolbarDecorator.findEditButton(this.toolbarPanel);
         this.toolbarRemoveActionButton = ToolbarDecorator.findRemoveButton(this.toolbarPanel);
+
+        toggleToolbarButtons(true, false, false);
 
         JPanel leftPanel = new JPanel(new BorderLayout());
 
@@ -239,24 +278,32 @@ public class TemplateForm {
 
                     listPopup.show(anActionButton.getPreferredPopupPoint());
 
-                    /*String child = RandomStringUtils.randomAlphabetic(10);
+                })
+                .setEditAction(anActionButton -> {
 
-                    TreePath parentPath = tree.getSelectionPath();
-
-                    DefaultMutableTreeNode parentNode = null;
+                    TreePath parentPath = structureTree.getSelectionPath();
 
                     if (parentPath == null) {
-                        //There is no selection. Default to the root node.
-                        parentNode = rootNode;
-                    } else {
-                        parentNode = (DefaultMutableTreeNode) (parentPath.getLastPathComponent());
+                        return;
                     }
 
-                    DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(child);
+                    DefaultMutableTreeNode node = (DefaultMutableTreeNode) parentPath.getLastPathComponent();
 
-                    treeModel.insertNodeInto(childNode, parentNode, parentNode.getChildCount());
+                    TemplateStructureNode templateStructureNode = (TemplateStructureNode) node.getUserObject();
 
-                    tree.scrollPathToVisible(new TreePath(childNode.getPath()));*/
+                    TemplateStructureEditNodeNameDialog dialog = new TemplateStructureEditNodeNameDialog(
+                            templateStructureNode.getName(),
+                            project
+                    );
+
+                    if (!dialog.showAndGet()) {
+                        return;
+                    }
+
+                    templateStructureNode.setName(dialog.getName());
+                    template.changeStatusToChangedIfPossible();
+
+                    this.structureTreeModel.nodeChanged(node);
 
                 })
                 .setRemoveAction(anActionButton -> {
@@ -267,7 +314,13 @@ public class TemplateForm {
                         return;
                     }
 
-                    structureTreeModel.removeNodeFromParent((MutableTreeNode) parentPath.getLastPathComponent());
+                    DefaultMutableTreeNode node = (DefaultMutableTreeNode) parentPath.getLastPathComponent();
+
+                    TemplateStructureNode templateStructureNode = (TemplateStructureNode) node.getUserObject();
+
+                    if (new TemplateStructureNodeDeleteConfirmDialog(templateStructureNode, project, splitter).showAndGet()) {
+                        this.structureTreeModel.removeNodeFromParent((MutableTreeNode) parentPath.getLastPathComponent());
+                    }
 
                 })
                 .setToolbarPosition(ActionToolbarPosition.TOP);
@@ -280,7 +333,7 @@ public class TemplateForm {
 
         Tree structureTree = new Tree(treeModel);
 
-        structureTree.setEditable(false);
+        structureTree.setEditable(true);
         structureTree.setRootVisible(true);
         structureTree.setShowsRootHandles(false);
         structureTree.setExpandableItemsEnabled(true);
@@ -293,7 +346,7 @@ public class TemplateForm {
                     if (node.getUserObject() instanceof TemplateStructureNode structureNode) {
                         switch (structureNode.getNodeType()) {
                             case FILE -> setIcon(AllIcons.FileTypes.Text);
-                            case FOLDER -> setIcon(PlatformIcons.FOLDER_ICON);
+                            case ROOT, FOLDER -> setIcon(PlatformIcons.FOLDER_ICON);
                         }
                     }
                 }
@@ -312,15 +365,16 @@ public class TemplateForm {
 
             // TODO
 
-            if (this.fileEditor != null) {
-                this.editorFactory.releaseEditor(this.fileEditor);
-                this.fileEditor = null;
+            if (this.templateDocumentListener != null) {
+                this.editorTextField.getDocument().removeDocumentListener(this.templateDocumentListener);
+                this.templateDocumentListener = null;
             }
 
             DefaultMutableTreeNode selectedNode = ((DefaultMutableTreeNode) this.structureTree.getLastSelectedPathComponent());
 
             if (selectedNode == null) {
-                resetFileTemplatePanelAndDisableToolbarButtons();
+                this.detailsComponent.setContent(null);
+                toggleToolbarButtons(true, false, false);
                 return;
             }
 
@@ -337,13 +391,27 @@ public class TemplateForm {
                 return;
             }
 
-            toggleToolbarButtons(false);
+            toggleToolbarButtons(false, true, true);
 
             JPanel jPanel = new JPanel(new GridLayoutManager(1, 1));
 
-            this.fileEditor = this.editorFactory.createEditor(this.editorFactory.createDocument(""), this.project, EditorKind.MAIN_EDITOR);
+            this.editorTextField.setNewDocumentAndFileType(
+                    JavaScriptFileType.INSTANCE,
+                    new DocumentImpl(Optional.ofNullable(templateStructureNode.getTemplate()).orElse(""))
+            );
 
-            jPanel.add(this.fileEditor.getComponent(), new GridConstraints(
+            this.templateDocumentListener = new DocumentListener() {
+                @Override
+                public void documentChanged(@NotNull DocumentEvent event) {
+                    log.info("Document changed");
+                    templateStructureNode.setTemplate(event.getDocument().getText());
+                    template.changeStatusToChangedIfPossible();
+                }
+            };
+
+            this.editorTextField.getDocument().addDocumentListener(this.templateDocumentListener);
+
+            jPanel.add(this.editorTextField.getComponent(), new GridConstraints(
                     0,
                     0,
                     1,
@@ -357,28 +425,31 @@ public class TemplateForm {
 
             this.detailsComponent.setContent(jPanel);
 
+            if (this.editorTextField.getEditor() != null) {
+                this.editorTextField.getEditor().setBorder(JBUI.Borders.customLine(JBColor.BLACK));
+                this.editorTextField.getEditor().getInsets().set(0, 0, 0, 0);
+            }
+
         });
 
         return structureTree;
     }
 
     private void toggleToolbarButtons(boolean enabled) {
-        toggleToolbarButtons(enabled, enabled);
+        toggleToolbarButtons(enabled, enabled, enabled);
     }
 
-    private void toggleToolbarButtons(boolean addEnabled, boolean removeEnabled) {
+    private void toggleToolbarButtons(boolean addEnabled, boolean editEnabled, boolean removeEnabled) {
         toolbarAddActionButton.setEnabled(addEnabled);
+        toolbarEditActionButton.setEnabled(editEnabled);
         toolbarRemoveActionButton.setEnabled(removeEnabled);
     }
 
     private void fillFormFromTemplateIfExists() {
 
-        if (this.template != null && this.template.getLayer() != null) {
+        if (this.template != null) {
 
             this.nameTextField.setText(this.template.getName());
-            this.layerComboBox.setSelectedItem(this.template.getLayer());
-
-            // TODO fill structure
 
             this.detailsComponent.setText(this.template.getName() + " template");
 

@@ -2,6 +2,7 @@ package design.featuresliced.helper.gui.form.settings;
 
 import com.intellij.openapi.actionSystem.ActionToolbarPosition;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DetailsComponent;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.OnePixelSplitter;
@@ -10,17 +11,29 @@ import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.components.JBList;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.util.ui.JBUI;
+import design.featuresliced.helper.gui.dialog.settings.confirm.TemplateCreateConfirmDialog;
+import design.featuresliced.helper.gui.dialog.settings.confirm.TemplateDeleteConfirmDialog;
 import design.featuresliced.helper.model.settings.templates.Template;
+import design.featuresliced.helper.model.type.TemplateStatusType;
 import design.featuresliced.helper.model.type.fsd.LayerType;
+import design.featuresliced.helper.service.ProjectTemplatesService;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.util.Arrays;
+import java.util.Set;
 
 public class TemplatesSettingsForm {
 
     private final Project project;
 
     private final DetailsComponent detailsComponent;
+
+    private final ProjectTemplatesService projectTemplatesService;
+
+    private final CollectionListModel<Template> templatesListModel;
 
     private JPanel root;
 
@@ -30,57 +43,19 @@ public class TemplatesSettingsForm {
 
     private JBList<Template> templatesList;
 
+    private JComboBox<LayerType> layersComboBox;
+
     public TemplatesSettingsForm(Project project) {
         this.project = project;
-        this.detailsComponent = new DetailsComponent(true, true);
-
-        CollectionListModel<Template> templatesListModel = new CollectionListModel<>();
-
-        templatesList = new JBList<>(templatesListModel);
-        templatesList.setName("templatesList");
-
-        templatesList.setCellRenderer(
-                SimpleListCellRenderer.create((label, value, index) -> label.setText(value != null ? value.getName() : null))
-        );
+        this.detailsComponent = new DetailsComponent(false, true);
+        this.detailsComponent.setEmptyContentText("Select template");
+        this.detailsComponent.getContentGutter().getInsets().set(0, 5, 0, 5);
+        this.templatesListModel = new CollectionListModel<>();
+        this.projectTemplatesService = ProjectTemplatesService.getInstance(project);
 
         $$$setupUI$$$();
 
-        templatesList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        templatesList.getSelectionModel().addListSelectionListener(e -> {
-            Template selectedTemplate = templatesList.getSelectedValue();
-            if (selectedTemplate != null) {
-                detailsComponent.setContent(new TemplateForm(project, selectedTemplate).getRoot());
-            } else {
-                detailsComponent.setContent(null);
-            }
-        });
-
-        ToolbarDecorator templatesListToolbarDecorator = ToolbarDecorator.createDecorator(templatesList)
-                .initPosition()
-                .setAddAction(anActionButton -> {
-
-                })
-                .setRemoveAction(anActionButton -> {
-
-                })
-                .setToolbarPosition(ActionToolbarPosition.TOP);
-
-        templatesListPanel = templatesListToolbarDecorator.createPanel();
-        templatesListPanel.setName("templatesListPanel");
-
-        splitter.setFirstComponent(templatesListPanel);
-
-        detailsComponent.setEmptyContentText("Select template");
-        detailsComponent.setContent(null);
-
-        JPanel rootRightPanel = new JPanel(new BorderLayout());
-        rootRightPanel.setName("rootRightPanel");
-        rootRightPanel.add(detailsComponent.getComponent(), BorderLayout.CENTER);
-
-        splitter.setSecondComponent(rootRightPanel);
-
-        templatesListModel.add(new Template("test1", LayerType.PAGES));
-        templatesListModel.add(new Template("test2", LayerType.ENTITIES));
+        fillForm((LayerType) this.layersComboBox.getSelectedItem());
 
     }
 
@@ -109,8 +84,136 @@ public class TemplatesSettingsForm {
         return root;
     }
 
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
-        splitter = new OnePixelSplitter(0.210f);
+    public boolean isModified() {
+        return this.templatesListModel.getItems()
+                .stream()
+                .anyMatch(template -> template.getStatus() == TemplateStatusType.NEW
+                        || template.getStatus() == TemplateStatusType.CHANGED);
     }
+
+    private void createUIComponents() {
+
+        // TODO: place custom component creation code here
+        this.splitter = new OnePixelSplitter(0.210f);
+
+        JPanel leftPanel = new JPanel(new GridLayoutManager(3, 2, JBUI.emptyInsets(), -1, -1));
+
+        leftPanel.add(new JLabel("Layer:"), new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+
+        this.layersComboBox = new ComboBox<>();
+
+        this.layersComboBox.setRenderer(
+                SimpleListCellRenderer.create((label, value, index) -> label.setText(value != null ? value.getLabel() : null))
+        );
+        Arrays.stream(LayerType.values()).forEach(this.layersComboBox::addItem);
+
+        this.layersComboBox.addItemListener(e -> {
+            if (e.getID() != ItemEvent.ITEM_STATE_CHANGED && e.getStateChange() != ItemEvent.SELECTED) {
+                return;
+            }
+            this.templatesList.clearSelection();
+            this.templatesListModel.removeAll();
+            fillForm((LayerType) e.getItem());
+            resetRightPanel();
+        });
+
+        leftPanel.add(this.layersComboBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+
+        leftPanel.add(new JLabel("Templates:"), new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+
+        this.templatesList = new JBList<>(this.templatesListModel);
+        this.templatesList.setName("templatesList");
+
+        this.templatesList.setCellRenderer(SimpleListCellRenderer.create((label, value, index) -> {
+
+            String name = value != null ? value.getName() : null;
+
+            if (value.getStatus() == TemplateStatusType.NEW) {
+                name = name + "*";
+            }
+
+            label.setText(name);
+
+        }));
+
+        this.templatesList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.templatesList.getSelectionModel().addListSelectionListener(e -> {
+            Template selectedTemplate = this.templatesList.getSelectedValue();
+            if (selectedTemplate != null) {
+                this.detailsComponent.setContent(new TemplateForm(project, selectedTemplate).getRoot());
+            } else {
+                resetRightPanel();
+            }
+        });
+
+        ToolbarDecorator templatesListToolbarDecorator = ToolbarDecorator.createDecorator(templatesList)
+                .initPosition()
+                .setAddAction(anActionButton -> {
+
+                    TemplateCreateConfirmDialog dialog = new TemplateCreateConfirmDialog(project, splitter);
+
+                    if (!dialog.showAndGet()) {
+                        return;
+                    }
+
+                    Template newTemplate = new Template(
+                            dialog.getName(),
+                            (LayerType) this.layersComboBox.getSelectedItem(),
+                            TemplateStatusType.NEW
+                    );
+
+                    this.templatesListModel.add(newTemplate);
+
+                    this.templatesList.setSelectedValue(newTemplate, true);
+
+                    //this.projectTemplatesService.getState().addTemplate(newTemplate);
+
+                })
+                .setRemoveAction(anActionButton -> {
+
+                    Template template = this.templatesList.getSelectedValue();
+
+                    if (template == null) {
+                        return;
+                    }
+
+                    if (new TemplateDeleteConfirmDialog(template, project, splitter).showAndGet()) {
+                        this.templatesList.getSelectionModel().clearSelection();
+                        this.templatesListModel.remove(template);
+                    }
+
+                })
+                .setToolbarPosition(ActionToolbarPosition.TOP);
+
+        this.templatesListPanel = templatesListToolbarDecorator.createPanel();
+        this.templatesListPanel.setName("templatesListPanel");
+
+        leftPanel.add(this.templatesListPanel, new GridConstraints(2, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
+
+        this.splitter.setFirstComponent(leftPanel);
+
+        resetRightPanel();
+
+        JPanel rootRightPanel = new JPanel(new BorderLayout());
+        rootRightPanel.setName("rootRightPanel");
+        rootRightPanel.add(this.detailsComponent.getComponent(), BorderLayout.CENTER);
+
+        this.splitter.setSecondComponent(rootRightPanel);
+
+    }
+
+    private void fillForm(LayerType selectedLayer) {
+
+        Set<Template> layerTemplates = this.projectTemplatesService.getState().getTemplatesBy(selectedLayer);
+
+        for (Template template : layerTemplates) {
+            templatesListModel.add(template);
+        }
+
+    }
+
+    private void resetRightPanel() {
+        this.detailsComponent.setContent(null);
+    }
+
 }

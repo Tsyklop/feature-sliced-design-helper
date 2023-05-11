@@ -28,11 +28,11 @@ public class TemplateStructureCreateActionGroup extends ActionGroup {
     @Override
     public AnAction @NotNull [] getChildren(@Nullable AnActionEvent e) {
         return new AnAction[]{
-                new CreateIndexTemplateStructureSettingsAction(this.tree, this.project),
+                //new CreateIndexTemplateStructureSettingsAction(this.tree, this.project),
                 new CreateFileTemplateStructureSettingsAction(this.tree, this.project),
                 new CreateFolderTemplateStructureSettingsAction(this.tree, this.project),
                 new CreateStyleTemplateStructureSettingsAction(this.tree, this.project),
-                new CreateSegmentTemplateStructureSettingsAction(this.tree, this.project),
+                //new CreateSegmentTemplateStructureSettingsAction(this.tree, this.project),
         };
     }
 

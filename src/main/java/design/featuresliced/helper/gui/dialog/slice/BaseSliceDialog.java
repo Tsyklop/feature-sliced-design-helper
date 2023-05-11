@@ -14,7 +14,7 @@ import design.featuresliced.helper.model.settings.ProjectGeneralSettings;
 import design.featuresliced.helper.model.type.JsLibraryExtensionsType;
 import design.featuresliced.helper.model.type.JsLibraryType;
 import design.featuresliced.helper.model.type.fsd.LayerType;
-import design.featuresliced.helper.service.ProjectService;
+import design.featuresliced.helper.service.ProjectGeneralService;
 import design.featuresliced.helper.util.FileTemplateUtil;
 import design.featuresliced.helper.util.FileUtil;
 import design.featuresliced.helper.util.JsLibraryUtil;
@@ -43,9 +43,9 @@ public abstract class BaseSliceDialog<F extends BaseSliceForm> extends BaseDialo
     @Override
     protected void doOKAction() {
 
-        ProjectService projectService = ProjectService.getInstance(project);
+        ProjectGeneralService projectGeneralService = ProjectGeneralService.getInstance(project);
 
-        ProjectGeneralSettings projectGeneralSettings = projectService.getState();
+        ProjectGeneralSettings projectGeneralSettings = projectGeneralService.getState();
 
         // [user] or [auth, login-form] e.t.c
         final String[] slicePaths = this.form.getName().replace("\\", "/").split("/");
@@ -55,7 +55,7 @@ public abstract class BaseSliceDialog<F extends BaseSliceForm> extends BaseDialo
 
         final String sliceNameForUi = NameUtil.normalizeNameForUiIfNeed(sliceName);
 
-        final VirtualFile sourcesRoot = projectService.getSourcesRoot();
+        final VirtualFile sourcesRoot = projectGeneralService.getSourcesRoot();
 
         final JsLibraryExtensionsType jsLibraryExtensions = JsLibraryUtil.resolveLibraryExtension(jsLibrary, sourcesRoot);
 

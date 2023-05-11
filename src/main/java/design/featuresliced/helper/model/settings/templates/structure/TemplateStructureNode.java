@@ -3,8 +3,11 @@ package design.featuresliced.helper.model.settings.templates.structure;
 import design.featuresliced.helper.model.type.FileExtensionType;
 import design.featuresliced.helper.model.type.TemplateStructureNodeType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class TemplateStructureNode {
@@ -15,28 +18,28 @@ public class TemplateStructureNode {
 
     private FileExtensionType extensionType;
 
-    private List<TemplateStructureNode> nodes;
+    private final List<TemplateStructureNode> nodes;
 
     private final @NotNull TemplateStructureNodeType nodeType;
 
-    public TemplateStructureNode(String name,
+    public TemplateStructureNode(@NotNull String name,
                                  @NotNull TemplateStructureNodeType nodeType) {
-        this(name, null, nodeType, null);
+        this(name, null, nodeType, new ArrayList<>());
     }
 
-    public TemplateStructureNode(String name,
-                                 FileExtensionType extensionType,
+    public TemplateStructureNode(@NotNull String name,
+                                 @Nullable FileExtensionType extensionType,
                                  @NotNull TemplateStructureNodeType nodeType) {
-        this(name, extensionType, nodeType, null);
+        this(name, extensionType, nodeType, new ArrayList<>());
     }
 
-    public TemplateStructureNode(String name,
-                                 FileExtensionType extensionType,
+    public TemplateStructureNode(@NotNull String name,
+                                 @Nullable FileExtensionType extensionType,
                                  @NotNull TemplateStructureNodeType nodeType,
-                                 List<TemplateStructureNode> nodes) {
-        this.name = name;
-        this.nodes = nodes;
-        this.nodeType = nodeType;
+                                 @NotNull List<TemplateStructureNode> nodes) {
+        this.name = Objects.requireNonNull(name);
+        this.nodes = Objects.requireNonNull(nodes);
+        this.nodeType = Objects.requireNonNull(nodeType);
         this.extensionType = extensionType;
     }
 
@@ -83,6 +86,14 @@ public class TemplateStructureNode {
         this.template = template;
     }
 
+    public void addNode(TemplateStructureNode node) {
+        this.nodes.add(node);
+    }
+
+    public void removeNode(TemplateStructureNode node) {
+        this.nodes.remove(node);
+    }
+
     @Override
     public String toString() {
         return name + getExtensionIfNodeFile().orElse("");
@@ -92,6 +103,6 @@ public class TemplateStructureNode {
         if (!nodeType.isFile()) {
             return Optional.empty();
         }
-        return Optional.of(extensionType != null && !extensionType.isAuto() ? extensionType.getValue() : ".[[ext]]");
+        return Optional.of(extensionType != null ? extensionType.getValue() : "");
     }
 }

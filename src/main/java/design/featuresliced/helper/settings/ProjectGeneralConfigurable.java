@@ -7,7 +7,7 @@ import com.intellij.openapi.util.NlsContexts;
 import design.featuresliced.helper.gui.form.settings.GeneralSettingsForm;
 import design.featuresliced.helper.model.settings.ProjectGeneralSettings;
 import design.featuresliced.helper.model.type.fsd.LayerType;
-import design.featuresliced.helper.service.ProjectService;
+import design.featuresliced.helper.service.ProjectGeneralService;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,15 +18,15 @@ public class ProjectGeneralConfigurable implements SearchableConfigurable {
 
     private GeneralSettingsForm form;
 
-    private final ProjectService projectService;
+    private final ProjectGeneralService projectGeneralService;
 
     public ProjectGeneralConfigurable(Project project) {
-        this.projectService = ProjectService.getInstance(project);
+        this.projectGeneralService = ProjectGeneralService.getInstance(project);
     }
 
     @Override
     public @NotNull @NonNls String getId() {
-        return "design.featuresliced.helper.settings.ProjectConfigurable";
+        return "design.featuresliced.helper.settings.ProjectGeneralConfigurable";
     }
 
     @Override
@@ -36,20 +36,20 @@ public class ProjectGeneralConfigurable implements SearchableConfigurable {
 
     @Override
     public @Nullable JComponent createComponent() {
-        this.form = new GeneralSettingsForm(this.projectService.getProject());
-        this.form.fillFrom(this.projectService.getState());
+        this.form = new GeneralSettingsForm(this.projectGeneralService.getProject());
+        this.form.fillFrom(this.projectGeneralService.getState());
         return this.form.getRoot();
     }
 
     @Override
     public boolean isModified() {
-        return this.form.isModified(this.projectService.getState());
+        return this.form.isModified(this.projectGeneralService.getState());
     }
 
     @Override
     public void apply() throws ConfigurationException {
 
-        ProjectGeneralSettings projectGeneralSettings = this.projectService.getState();
+        ProjectGeneralSettings projectGeneralSettings = this.projectGeneralService.getState();
 
         if (projectGeneralSettings == null) {
             projectGeneralSettings = new ProjectGeneralSettings();
@@ -71,7 +71,7 @@ public class ProjectGeneralConfigurable implements SearchableConfigurable {
     @Override
     public void reset() {
         if (this.form != null) {
-            this.form.fillFrom(this.projectService.getState());
+            this.form.fillFrom(this.projectGeneralService.getState());
         }
     }
 

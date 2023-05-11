@@ -28,7 +28,8 @@
                            toolWindowId="Project"
         />
 
-        <projectService serviceImplementation="design.featuresliced.helper.service.ProjectService"/>
+        <projectService serviceImplementation="design.featuresliced.helper.service.ProjectGeneralService"/>
+        <projectService serviceImplementation="design.featuresliced.helper.service.ProjectTemplatesService"/>
 
         <projectConfigurable id="design.featuresliced.helper.settings.ProjectGeneralConfigurable"
                              parentId="root"

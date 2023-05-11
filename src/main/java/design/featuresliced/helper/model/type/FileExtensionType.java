@@ -7,7 +7,7 @@ public enum FileExtensionType {
     JSX(".jsx", ".jsx"),
     TSX(".tsx", ".tsx"),
     VUE(".vue", ".vue"),
-    AUTO("Auto", "auto");
+    AUTO("Auto", ".<auto>");
 
     private final String label;
     private final String value;

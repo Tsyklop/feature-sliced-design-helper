@@ -2,23 +2,21 @@ package design.featuresliced.helper.gui.dialog.settings;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import design.featuresliced.helper.gui.form.settings.structure.TemplateStructureAddFileForm;
 import design.featuresliced.helper.gui.form.settings.structure.TemplateStructureAddFolderForm;
-import design.featuresliced.helper.model.type.FileExtensionType;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class TemplateStructureAddFolderDialog extends DialogWrapper {
+public class TemplateStructureAddStyleDialog extends DialogWrapper {
 
     private final TemplateStructureAddFolderForm form;
 
-    public TemplateStructureAddFolderDialog(@Nullable Project project) {
+    public TemplateStructureAddStyleDialog(@Nullable Project project) {
         super(project, false);
         this.form = new TemplateStructureAddFolderForm();
         init();
         initValidation();
-        setTitle("Add folder to structure");
+        setTitle("Add style to structure");
     }
 
     public String getName() {

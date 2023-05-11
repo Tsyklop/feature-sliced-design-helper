@@ -10,10 +10,11 @@ import javax.swing.*;
 
 public class TemplateStructureAddFileDialog extends DialogWrapper {
 
-    private TemplateStructureAddFileForm form;
+    private final TemplateStructureAddFileForm form;
 
     public TemplateStructureAddFileDialog(@Nullable Project project) {
         super(project, false);
+        this.form = new TemplateStructureAddFileForm();
         init();
         initValidation();
         setTitle("Add file to structure");
@@ -29,7 +30,6 @@ public class TemplateStructureAddFileDialog extends DialogWrapper {
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
-        this.form = new TemplateStructureAddFileForm();
         return this.form.$$$getRootComponent$$$();
     }
 

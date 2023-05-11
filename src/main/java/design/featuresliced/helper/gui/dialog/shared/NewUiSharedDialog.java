@@ -12,7 +12,7 @@ import design.featuresliced.helper.gui.form.fsd.shared.UiSharedForm;
 import design.featuresliced.helper.model.type.JsLibraryExtensionsType;
 import design.featuresliced.helper.model.type.JsLibraryType;
 import design.featuresliced.helper.model.type.fsd.SegmentType;
-import design.featuresliced.helper.service.ProjectService;
+import design.featuresliced.helper.service.ProjectGeneralService;
 import design.featuresliced.helper.util.FileTemplateUtil;
 import design.featuresliced.helper.util.FileUtil;
 import design.featuresliced.helper.util.JsLibraryUtil;
@@ -52,13 +52,13 @@ public class NewUiSharedDialog extends BaseSharedDialog<UiSharedForm> {
     @Override
     protected void doOKAction() {
 
-        ProjectService projectService = ProjectService.getInstance(project);
+        ProjectGeneralService projectGeneralService = ProjectGeneralService.getInstance(project);
 
         final String componentName = this.form.getName();
 
-        final VirtualFile sourcesRoot = projectService.getSourcesRoot();
+        final VirtualFile sourcesRoot = projectGeneralService.getSourcesRoot();
 
-        final JsLibraryExtensionsType jsLibraryExtensions = JsLibraryUtil.resolveLibraryExtension(jsLibrary, projectService.getProjectRoot());
+        final JsLibraryExtensionsType jsLibraryExtensions = JsLibraryUtil.resolveLibraryExtension(jsLibrary, projectGeneralService.getProjectRoot());
 
         CommandProcessor.getInstance().executeCommand(project, () -> {
 

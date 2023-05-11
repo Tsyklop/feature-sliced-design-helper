@@ -4,7 +4,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.Tree;
 import design.featuresliced.helper.actions.settings.BaseSettingsAction;
 import design.featuresliced.helper.model.settings.templates.structure.TemplateStructureNode;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -17,7 +20,7 @@ public abstract class BaseTemplateStructureSettingsAction extends BaseSettingsAc
 
     protected final DefaultTreeModel treeModel;
 
-    protected BaseTemplateStructureSettingsAction(String name, Tree tree, Project project) {
+    public BaseTemplateStructureSettingsAction(@NotNull String name, @NotNull Tree tree, @NotNull Project project) {
         super(name);
         this.tree = tree;
         this.project = project;
