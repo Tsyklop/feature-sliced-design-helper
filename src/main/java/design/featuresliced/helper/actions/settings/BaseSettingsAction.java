@@ -12,4 +12,8 @@ public abstract class BaseSettingsAction extends AnAction {
         super(text);
     }
 
+    public BaseSettingsAction(@Nullable @NlsActions.ActionText String text, @Nullable Icon icon) {
+        super(text, "", icon);
+    }
+
 }

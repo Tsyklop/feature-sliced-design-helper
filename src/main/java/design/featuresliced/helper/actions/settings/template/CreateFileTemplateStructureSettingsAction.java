@@ -3,13 +3,9 @@ package design.featuresliced.helper.actions.settings.template;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.Tree;
-import design.featuresliced.helper.gui.dialog.settings.TemplateStructureAddFileDialog;
+import design.featuresliced.helper.gui.dialog.settings.structure.TemplateStructureAddEditFileDialog;
 import design.featuresliced.helper.model.settings.templates.structure.TemplateStructureNode;
-import design.featuresliced.helper.model.type.TemplateStructureNodeType;
 import org.jetbrains.annotations.NotNull;
-
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 
 public class CreateFileTemplateStructureSettingsAction extends BaseTemplateStructureSettingsAction {
 
@@ -20,7 +16,7 @@ public class CreateFileTemplateStructureSettingsAction extends BaseTemplateStruc
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
 
-        TemplateStructureAddFileDialog dialog = new TemplateStructureAddFileDialog(project);
+        TemplateStructureAddEditFileDialog dialog = new TemplateStructureAddEditFileDialog(project);
 
         if (!dialog.showAndGet()) {
             return;

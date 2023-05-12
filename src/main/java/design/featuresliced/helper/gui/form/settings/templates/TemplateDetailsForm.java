@@ -1,5 +1,6 @@
-package design.featuresliced.helper.gui.form.settings;
+package design.featuresliced.helper.gui.form.settings.templates;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.icons.AllIcons;
 import com.intellij.lang.javascript.JavaScriptFileType;
 import com.intellij.openapi.actionSystem.ActionPlaces;
@@ -23,13 +24,18 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.util.PlatformIcons;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.TextTransferable;
 import design.featuresliced.helper.actions.group.TemplateStructureCreateActionGroup;
-import design.featuresliced.helper.gui.dialog.settings.TemplateStructureEditNodeNameDialog;
+import design.featuresliced.helper.gui.dialog.settings.structure.TemplateStructureAddEditFileDialog;
+import design.featuresliced.helper.gui.dialog.settings.structure.TemplateStructureAddEditFolderDialog;
 import design.featuresliced.helper.gui.dialog.settings.confirm.TemplateStructureNodeDeleteConfirmDialog;
+import design.featuresliced.helper.gui.dialog.settings.structure.TemplateStructureAddEditStyleDialog;
 import design.featuresliced.helper.model.settings.templates.Template;
 import design.featuresliced.helper.model.settings.templates.structure.TemplateStructureNode;
-import design.featuresliced.helper.model.type.TemplateStructureNodeType;
+import design.featuresliced.helper.model.type.FileExtensionType;
+import design.featuresliced.helper.model.type.template.TemplateStructureNodeType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.TreeModelEvent;
@@ -42,11 +48,15 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.Optional;
 
-public class TemplateForm {
+public class TemplateDetailsForm {
 
-    private static final Logger log = Logger.getInstance(TemplateForm.class);
+    private static final Logger log = Logger.getInstance(TemplateDetailsForm.class);
 
     private final Project project;
 
@@ -66,8 +76,6 @@ public class TemplateForm {
 
     private JPanel toolbarPanel;
 
-    private JTextField nameTextField;
-
     private AnActionButton toolbarAddActionButton;
 
     private AnActionButton toolbarEditActionButton;
@@ -76,44 +84,25 @@ public class TemplateForm {
 
     private DocumentListener templateDocumentListener;
 
-    public TemplateForm(@NotNull Project project, @NotNull Template template) {
+    public TemplateDetailsForm(@NotNull Project project, @NotNull Template template) {
         this.project = project;
         this.template = template;
-
         this.editorTextField = new EditorTextField(project, JavaScriptFileType.INSTANCE) {
             @Override
             protected boolean shouldHaveBorder() {
                 return false;
             }
         };
-
         this.detailsComponent = new DetailsComponent(false, true);
+        this.detailsComponent.getContentGutter().getInsets().set(0, 5, 0, 5);
         this.structureTreeModel = new DefaultTreeModel(null);
 
         $$$setupUI$$$();
 
-        this.nameTextField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-
-            @Override
-            public void insertUpdate(javax.swing.event.DocumentEvent e) {
-            }
-
-            @Override
-            public void removeUpdate(javax.swing.event.DocumentEvent e) {
-            }
-
-            @Override
-            public void changedUpdate(javax.swing.event.DocumentEvent e) {
-                template.setName(nameTextField.getText());
-            }
-
-        });
-
         this.detailsComponent.setContent(null);
-        this.detailsComponent.setEmptyContentText("Select node from structure");
-        this.detailsComponent.setDetailsModeEnabled(false);
+        this.detailsComponent.setEmptyContentText("Select file from structure");
 
-        fillFormFromTemplateIfExists();
+        fillFormFromTemplateIfExists(template);
 
     }
 
@@ -127,21 +116,12 @@ public class TemplateForm {
     private void $$$setupUI$$$() {
         createUIComponents();
         root = new JPanel();
-        root.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
+        root.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         root.setMinimumSize(new Dimension(-1, -1));
         root.setOpaque(true);
         root.setPreferredSize(new Dimension(-1, -1));
-        final JLabel label1 = new JLabel();
-        label1.setText("Name:");
-        root.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        nameTextField = new JTextField();
-        nameTextField.setName("templateName");
-        root.add(nameTextField, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        final JPanel panel1 = new JPanel();
-        panel1.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        root.add(panel1, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         splitter.setName("templateSplitter");
-        panel1.add(splitter, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        root.add(splitter, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
     }
 
     /**
@@ -157,14 +137,6 @@ public class TemplateForm {
 
     public JBSplitter getSplitter() {
         return splitter;
-    }
-
-    public String getName() {
-        return getNameTextField().getText();
-    }
-
-    public JTextField getNameTextField() {
-        return nameTextField;
     }
 
     private void createUIComponents() {
@@ -291,7 +263,45 @@ public class TemplateForm {
 
                     TemplateStructureNode templateStructureNode = (TemplateStructureNode) node.getUserObject();
 
-                    TemplateStructureEditNodeNameDialog dialog = new TemplateStructureEditNodeNameDialog(
+                    switch (templateStructureNode.getNodeType()) {
+                        case FILE -> {
+                            TemplateStructureAddEditFileDialog fileDialog = new TemplateStructureAddEditFileDialog(
+                                    templateStructureNode.getName(),
+                                    templateStructureNode.getExtensionType(),
+                                    project
+                            );
+                            if (!fileDialog.showAndGet()) {
+                                return;
+                            }
+                            updateTemplateStructureNode(templateStructureNode, fileDialog.getName(), fileDialog.getExtensionType());
+                            this.structureTreeModel.nodeChanged(node);
+                        }
+                        case STYLE -> {
+                            TemplateStructureAddEditStyleDialog styleDialog = new TemplateStructureAddEditStyleDialog(
+                                    templateStructureNode.getName(),
+                                    templateStructureNode.getExtensionType(),
+                                    project
+                            );
+                            if (!styleDialog.showAndGet()) {
+                                return;
+                            }
+                            updateTemplateStructureNode(templateStructureNode, styleDialog.getName(), styleDialog.getExtensionType());
+                            this.structureTreeModel.nodeChanged(node);
+                        }
+                        case FOLDER -> {
+                            TemplateStructureAddEditFolderDialog folderDialog = new TemplateStructureAddEditFolderDialog(
+                                    templateStructureNode.getName(),
+                                    project
+                            );
+                            if (!folderDialog.showAndGet()) {
+                                return;
+                            }
+                            updateTemplateStructureNode(templateStructureNode, folderDialog.getName(), null);
+                            this.structureTreeModel.nodeChanged(node);
+                        }
+                    }
+
+                    /*TemplateStructureEditNodeDialog dialog = new TemplateStructureEditNodeDialog(
                             templateStructureNode.getName(),
                             project
                     );
@@ -303,7 +313,7 @@ public class TemplateForm {
                     templateStructureNode.setName(dialog.getName());
                     template.changeStatusToChangedIfPossible();
 
-                    this.structureTreeModel.nodeChanged(node);
+                    this.structureTreeModel.nodeChanged(node);*/
 
                 })
                 .setRemoveAction(anActionButton -> {
@@ -329,36 +339,30 @@ public class TemplateForm {
 
     }
 
+    private void updateTemplateStructureNode(TemplateStructureNode templateStructureNode,
+                                             String updatedName,
+                                             FileExtensionType updatedExtensionType) {
+        templateStructureNode.setName(updatedName);
+        if (updatedExtensionType != null) {
+            templateStructureNode.setExtensionType(updatedExtensionType);
+        }
+        template.changeStatusToChangedIfPossible();
+    }
+
     private Tree initStructureTree(TreeModel treeModel) {
 
         Tree structureTree = new Tree(treeModel);
 
-        structureTree.setEditable(true);
+        structureTree.setDropMode(DropMode.USE_SELECTION);
+        structureTree.setEditable(false);
+        structureTree.setDragEnabled(true);
         structureTree.setRootVisible(true);
         structureTree.setShowsRootHandles(false);
         structureTree.setExpandableItemsEnabled(true);
 
-        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer() {
-            @Override
-            public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-                super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-                if (value instanceof DefaultMutableTreeNode node) {
-                    if (node.getUserObject() instanceof TemplateStructureNode structureNode) {
-                        switch (structureNode.getNodeType()) {
-                            case FILE -> setIcon(AllIcons.FileTypes.Text);
-                            case STYLE -> setIcon(AllIcons.FileTypes.Css);
-                            case ROOT, FOLDER -> setIcon(PlatformIcons.FOLDER_ICON);
-                        }
-                    }
-                }
-                return this;
-            }
-        };
-        renderer.setLeafIcon(null);
-        renderer.setOpenIcon(null);
-        renderer.setClosedIcon(null);
+        structureTree.setCellRenderer(new StructureTreeCellRenderer());
 
-        structureTree.setCellRenderer(renderer);
+        structureTree.setTransferHandler(new StructureTransferHandler(structureTree));
 
         structureTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
@@ -425,7 +429,7 @@ public class TemplateForm {
             this.detailsComponent.setContent(jPanel);
 
             if (this.editorTextField.getEditor() != null) {
-                this.editorTextField.getEditor().setBorder(JBUI.Borders.customLine(JBColor.BLACK));
+                this.editorTextField.getEditor().setBorder(JBUI.Borders.empty());
                 this.editorTextField.getEditor().getInsets().set(0, 0, 0, 0);
             }
 
@@ -444,24 +448,19 @@ public class TemplateForm {
         toolbarRemoveActionButton.setEnabled(removeEnabled);
     }
 
-    private void fillFormFromTemplateIfExists() {
+    private void fillFormFromTemplateIfExists(Template template) {
 
-        if (this.template != null) {
+        if (template != null) {
 
-            this.nameTextField.setText(this.template.getName());
-
-            this.detailsComponent.setText(this.template.getName() + " template");
-
-            if (this.template.isNew()) {
-                this.template.setRootNode(new TemplateStructureNode("<layerName>", TemplateStructureNodeType.ROOT));
+            if (template.isNew()) {
+                template.setRootNode(new TemplateStructureNode("<layerName>", TemplateStructureNodeType.ROOT));
             }
 
-            DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(this.template.getRootNode());
+            DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(template.getRootNode());
 
-            populateNodesTree(rootNode, this.template.getRootNode().getNodes());
+            populateNodesTree(rootNode, template.getRootNode().getNodes());
 
             this.structureTreeModel.setRoot(rootNode);
-
 
         } else {
             this.detailsComponent.setText("New template");
@@ -476,10 +475,152 @@ public class TemplateForm {
 
     private void populateNodesTree(DefaultMutableTreeNode rootNode, java.util.List<TemplateStructureNode> nodes) {
 
-        for (TemplateStructureNode node: nodes) {
+        for (TemplateStructureNode node : nodes) {
             DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(node);
             populateNodesTree(treeNode, node.getNodes());
             rootNode.add(treeNode);
+        }
+
+    }
+
+    private static class StructureTransferHandler extends TransferHandler {
+
+        private final Tree structureTree;
+
+        private final ObjectMapper objectMapper;
+
+        private final DefaultTreeModel structureTreeModel;
+
+        private DefaultMutableTreeNode movingNode;
+
+        private StructureTransferHandler(Tree structureTree) {
+            this.structureTree = structureTree;
+            this.objectMapper = new ObjectMapper();
+            this.structureTreeModel = (DefaultTreeModel) structureTree.getModel();
+        }
+
+        @Override
+        public int getSourceActions(JComponent c) {
+            return TransferHandler.COPY_OR_MOVE;
+        }
+
+        @Nullable
+        @Override
+        protected Transferable createTransferable(JComponent c) {
+            try {
+                movingNode = (DefaultMutableTreeNode) ((Tree) c).getLastSelectedPathComponent();
+                return new TextTransferable(objectMapper.writeValueAsString(movingNode.getUserObject()));
+            } catch (Exception e) {
+                movingNode = null;
+                log.error(e);
+            }
+            return null;
+        }
+
+        public boolean canImport(TransferSupport info) {
+            // for the demo, we'll only support drops (not clipboard paste)
+            if (!info.isDrop()) {
+                return false;
+            }
+
+            info.setShowDropLocation(true);
+
+            // we only import Strings
+            if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                return false;
+            }
+
+            // fetch the drop location
+            JTree.DropLocation dl = (JTree.DropLocation) info.getDropLocation();
+
+            TreePath path = dl.getPath();
+
+            if (path == null) {
+                return false;
+            }
+
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+
+            if (node.getUserObject() == null) {
+                return false;
+            }
+
+            TemplateStructureNode structureNode = ((TemplateStructureNode) node.getUserObject());
+
+            return structureNode.getNodeType().isFolderOrRoot();
+        }
+
+        @Override
+        protected void exportDone(JComponent source, Transferable data, int action) {
+            movingNode = null;
+        }
+
+        public boolean importData(TransferSupport info) {
+            // if we can't handle the import, say so
+            if (!canImport(info)) {
+                return false;
+            }
+
+            // fetch the drop location
+            JTree.DropLocation dl = (JTree.DropLocation) info.getDropLocation();
+
+            // fetch the path and child index from the drop location
+            TreePath path = dl.getPath();
+            int childIndex = dl.getChildIndex();
+
+            // fetch the data and bail if this fails
+            TemplateStructureNode data;
+            try {
+                data = objectMapper.readValue(info.getTransferable().getTransferData(DataFlavor.stringFlavor).toString(), TemplateStructureNode.class);
+            } catch (UnsupportedFlavorException | IOException e) {
+                return false;
+            }
+
+            // if child index is -1, the drop was on top of the path, so we'll
+            // treat it as inserting at the end of that path's list of children
+            if (childIndex == -1) {
+                childIndex = structureTreeModel.getChildCount(path.getLastPathComponent());
+            }
+
+            // create a new node to represent the data and insert it into the model
+            DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(data);
+            DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
+            structureTreeModel.insertNodeInto(newNode, parentNode, childIndex);
+
+            // make the new node visible and scroll so that it's visible
+            structureTree.makeVisible(path.pathByAddingChild(newNode));
+            structureTree.scrollRectToVisible(structureTree.getPathBounds(path.pathByAddingChild(newNode)));
+
+            if (movingNode != null) {
+                structureTreeModel.removeNodeFromParent(movingNode);
+                movingNode = null;
+            }
+
+            return true;
+        }
+    }
+
+    private static class StructureTreeCellRenderer extends DefaultTreeCellRenderer {
+
+        public StructureTreeCellRenderer() {
+            this.setLeafIcon(null);
+            this.setOpenIcon(null);
+            this.setClosedIcon(null);
+        }
+
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+            if (value instanceof DefaultMutableTreeNode node) {
+                if (node.getUserObject() instanceof TemplateStructureNode structureNode) {
+                    switch (structureNode.getNodeType()) {
+                        case FILE -> setIcon(AllIcons.FileTypes.Text);
+                        case STYLE -> setIcon(AllIcons.FileTypes.Css);
+                        case ROOT, FOLDER -> setIcon(PlatformIcons.FOLDER_ICON);
+                    }
+                }
+            }
+            return this;
         }
 
     }

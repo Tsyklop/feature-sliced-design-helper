@@ -1,4 +1,4 @@
-package design.featuresliced.helper.gui.form.settings;
+package design.featuresliced.helper.gui.form.settings.templates;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;

@@ -1,7 +1,5 @@
 package design.featuresliced.helper.model.type;
 
-import com.intellij.util.ObjectUtils;
-
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,9 +18,9 @@ public enum FileExtensionType {
     CSS_MODULES_CSS("CSS Modules", ".module.css", true),
     CSS_MODULES_SCSS("CSS Modules", ".module.scss", true),
     EMOTION("@emotion", Set.of(".jsx", ".tsx"), true),
-    STYLED_COMPONENTS("Styled Components", Set.of(".jsx", ".tsx"), true),
+    STYLED_COMPONENTS("Styled Components", Set.of(".jsx", ".tsx"), true);
 
-    AUTO("Auto", ".<auto>");
+    //AUTO("Auto", ".<auto>", true);
 
     public static final Set<FileExtensionType> FOR_STYLES = Arrays.stream(values())
             .filter(FileExtensionType::isCanUseForStyles)
@@ -63,9 +61,9 @@ public enum FileExtensionType {
         return values;
     }
 
-    public boolean isAuto() {
+    /*public boolean isAuto() {
         return this == AUTO;
-    }
+    }*/
 
     public boolean isCanUseForStyles() {
         return canUseForStyles;

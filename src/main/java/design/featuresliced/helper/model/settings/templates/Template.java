@@ -1,17 +1,15 @@
 package design.featuresliced.helper.model.settings.templates;
 
 import design.featuresliced.helper.model.settings.templates.structure.TemplateStructureNode;
-import design.featuresliced.helper.model.type.TemplateStatusType;
+import design.featuresliced.helper.model.type.template.TemplateStatusType;
 import design.featuresliced.helper.model.type.fsd.LayerType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Template {
+public class Template implements Comparable<Template> {
 
     private String uuid;
 
@@ -140,4 +138,10 @@ public class Template {
     public int hashCode() {
         return Objects.hash(uuid, name, layer, status, rootNode);
     }
+
+    @Override
+    public int compareTo(@NotNull Template o) {
+        return this.name.compareTo(o.getName());
+    }
+
 }

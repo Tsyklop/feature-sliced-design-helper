@@ -1,24 +1,37 @@
-package design.featuresliced.helper.gui.form.settings.structure;
+package design.featuresliced.helper.gui.form.settings.templates.structure;
 
 import com.intellij.ui.SimpleListCellRenderer;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import design.featuresliced.helper.model.type.FileExtensionType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.Set;
 
-public class TemplateStructureAddWithNameAndTypeForm {
+public class TemplateStructureAddEditStyleForm {
+
     private JPanel root;
     private JTextField nameTextField;
     private JComboBox<FileExtensionType> extensionComboBox;
 
-    public TemplateStructureAddWithNameAndTypeForm(Set<FileExtensionType> extensionTypes) {
+    public TemplateStructureAddEditStyleForm(@NotNull Set<FileExtensionType> extensionTypes) {
+        this(null, null, extensionTypes);
+    }
+
+    public TemplateStructureAddEditStyleForm(@Nullable String name,
+                                            @Nullable FileExtensionType extensionType,
+                                            @NotNull Set<FileExtensionType> extensionTypes) {
         this.extensionComboBox.setRenderer(SimpleListCellRenderer.create((label, value, index) -> {
             label.setText(value != null ? value.toString() : null);
         }));
         extensionTypes.forEach(this.extensionComboBox::addItem);
+        this.nameTextField.setText(name);
+        if (extensionType != null) {
+            this.extensionComboBox.setSelectedItem(extensionType);
+        }
     }
 
     {

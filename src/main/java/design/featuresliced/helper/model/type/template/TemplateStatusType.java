@@ -1,4 +1,4 @@
-package design.featuresliced.helper.model.type;
+package design.featuresliced.helper.model.type.template;
 
 public enum TemplateStatusType {
 

@@ -1,7 +1,8 @@
 package design.featuresliced.helper.model.settings.templates.structure;
 
 import design.featuresliced.helper.model.type.FileExtensionType;
-import design.featuresliced.helper.model.type.TemplateStructureNodeType;
+import design.featuresliced.helper.model.type.template.TemplateStructureNodeType;
+import design.featuresliced.helper.model.type.template.TemplateStructureVariableType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,8 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
-public class TemplateStructureNode {
+public class TemplateStructureNode implements Comparable<TemplateStructureNode> {
 
     private String name;
 
@@ -21,6 +23,8 @@ public class TemplateStructureNode {
     private List<TemplateStructureNode> nodes;
 
     private TemplateStructureNodeType nodeType;
+
+    private Set<TemplateStructureVariableType> variables;
 
     public TemplateStructureNode() {
         this("", TemplateStructureNodeType.ROOT);
@@ -125,16 +129,17 @@ public class TemplateStructureNode {
         this.nodeType = nodeType;
     }
 
+    public Set<TemplateStructureVariableType> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Set<TemplateStructureVariableType> variables) {
+        this.variables = variables;
+    }
+
     @Override
     public String toString() {
         return name + getExtensionIfNodeFile().orElse("");
-    }
-
-    private Optional<String> getExtensionIfNodeFile() {
-        if (!nodeType.isFile()) {
-            return Optional.empty();
-        }
-        return Optional.of(extensionType != null ? String.join(",", extensionType.getValues()) : "");
     }
 
     @Override
@@ -148,6 +153,18 @@ public class TemplateStructureNode {
     @Override
     public int hashCode() {
         return Objects.hash(name, template, extensionType, nodes, nodeType);
+    }
+
+    @Override
+    public int compareTo(@NotNull TemplateStructureNode o) {
+        return this.name.compareTo(o.getName());
+    }
+
+    private Optional<String> getExtensionIfNodeFile() {
+        if (!nodeType.isFile()) {
+            return Optional.empty();
+        }
+        return Optional.of(extensionType != null ? String.join(",", extensionType.getValues()) : "");
     }
 
 }

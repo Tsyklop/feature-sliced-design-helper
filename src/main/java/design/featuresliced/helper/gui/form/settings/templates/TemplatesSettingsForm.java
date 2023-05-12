@@ -1,9 +1,11 @@
-package design.featuresliced.helper.gui.form.settings;
+package design.featuresliced.helper.gui.form.settings.templates;
 
 import com.intellij.openapi.actionSystem.ActionToolbarPosition;
+import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DetailsComponent;
+import com.intellij.ui.AnActionButton;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.OnePixelSplitter;
 import com.intellij.ui.SimpleListCellRenderer;
@@ -12,10 +14,12 @@ import com.intellij.ui.components.JBList;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.util.ui.JBUI;
-import design.featuresliced.helper.gui.dialog.settings.confirm.TemplateCreateConfirmDialog;
+import design.featuresliced.helper.actions.settings.toolbar.TemplatesToolbarCopyAction;
+import design.featuresliced.helper.actions.settings.toolbar.TemplatesToolbarPasteAction;
+import design.featuresliced.helper.gui.dialog.settings.TemplateAddEditDialog;
 import design.featuresliced.helper.gui.dialog.settings.confirm.TemplateDeleteConfirmDialog;
 import design.featuresliced.helper.model.settings.templates.Template;
-import design.featuresliced.helper.model.type.TemplateStatusType;
+import design.featuresliced.helper.model.type.template.TemplateStatusType;
 import design.featuresliced.helper.model.type.fsd.LayerType;
 import design.featuresliced.helper.service.ProjectTemplatesService;
 
@@ -23,7 +27,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.util.Arrays;
-import java.util.Set;
 
 public class TemplatesSettingsForm {
 
@@ -44,6 +47,10 @@ public class TemplatesSettingsForm {
     private JBList<Template> templatesList;
 
     private JComboBox<LayerType> layersComboBox;
+
+    private AnActionButton copyActionButton;
+
+    private AnActionButton pasteActionButton;
 
     public TemplatesSettingsForm(Project project) {
         this.project = project;
@@ -154,7 +161,7 @@ public class TemplatesSettingsForm {
         this.templatesList.getSelectionModel().addListSelectionListener(e -> {
             Template selectedTemplate = this.templatesList.getSelectedValue();
             if (selectedTemplate != null) {
-                this.detailsComponent.setContent(new TemplateForm(project, selectedTemplate).getRoot());
+                this.detailsComponent.setContent(new TemplateDetailsForm(project, selectedTemplate).getRoot());
             } else {
                 resetRightPanel();
             }
@@ -164,7 +171,7 @@ public class TemplatesSettingsForm {
                 .initPosition()
                 .setAddAction(anActionButton -> {
 
-                    TemplateCreateConfirmDialog dialog = new TemplateCreateConfirmDialog(project, splitter);
+                    TemplateAddEditDialog dialog = new TemplateAddEditDialog(project, splitter);
 
                     if (!dialog.showAndGet()) {
                         return;
@@ -176,7 +183,24 @@ public class TemplatesSettingsForm {
 
                     this.templatesList.setSelectedValue(newTemplate, true);
 
-                    //this.projectTemplatesService.getState().addTemplate(newTemplate);
+                })
+                .setEditAction(anActionButton -> {
+
+                    Template selectedTemplate = templatesList.getSelectedValue();
+
+                    if (selectedTemplate == null) {
+                        return;
+                    }
+
+                    TemplateAddEditDialog dialog = new TemplateAddEditDialog(selectedTemplate.getName(), project, splitter);
+
+                    if (!dialog.showAndGet()) {
+                        return;
+                    }
+
+                    selectedTemplate.setName(dialog.getName());
+
+                    //this.templatesListModel.allContentsChanged();
 
                 })
                 .setRemoveAction(anActionButton -> {
@@ -194,6 +218,14 @@ public class TemplatesSettingsForm {
 
                 })
                 .setToolbarPosition(ActionToolbarPosition.TOP);
+
+        this.copyActionButton = new TemplatesToolbarCopyAction();
+        this.pasteActionButton = new TemplatesToolbarPasteAction();
+
+        this.copyActionButton.setEnabled(false);
+        this.pasteActionButton.setEnabled(false);
+
+        templatesListToolbarDecorator.addExtraActions((AnAction) copyActionButton, (AnAction) pasteActionButton);
 
         this.templatesListPanel = templatesListToolbarDecorator.createPanel();
         this.templatesListPanel.setName("templatesListPanel");

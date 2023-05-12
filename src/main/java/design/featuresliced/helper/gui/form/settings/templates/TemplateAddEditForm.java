@@ -1,17 +1,17 @@
-package design.featuresliced.helper.gui.form.settings.structure;
+package design.featuresliced.helper.gui.form.settings.templates;
 
-import com.intellij.ui.components.fields.ExpandableTextField;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class TemplateStructureEditNodeNameForm {
+public class TemplateAddEditForm {
     private JPanel root;
     private JTextField nameTextField;
 
-    public TemplateStructureEditNodeNameForm(String currentName) {
+    public TemplateAddEditForm(@NotNull String currentName) {
         this.nameTextField.setText(currentName);
     }
 
