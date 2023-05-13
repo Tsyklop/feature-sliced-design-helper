@@ -2,16 +2,17 @@ package design.featuresliced.helper.gui.form.settings.templates;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class TemplateAddEditForm {
+
     private JPanel root;
     private JTextField nameTextField;
 
-    public TemplateAddEditForm(@NotNull String currentName) {
+    public TemplateAddEditForm(@Nullable String currentName) {
         this.nameTextField.setText(currentName);
     }
 
@@ -35,7 +36,6 @@ public class TemplateAddEditForm {
         final JLabel label1 = new JLabel();
         label1.setText("Name:");
         root.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        nameTextField = new JTextField();
         root.add(nameTextField, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
     }
 

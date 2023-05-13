@@ -301,20 +301,6 @@ public class TemplateDetailsForm {
                         }
                     }
 
-                    /*TemplateStructureEditNodeDialog dialog = new TemplateStructureEditNodeDialog(
-                            templateStructureNode.getName(),
-                            project
-                    );
-
-                    if (!dialog.showAndGet()) {
-                        return;
-                    }
-
-                    templateStructureNode.setName(dialog.getName());
-                    template.changeStatusToChangedIfPossible();
-
-                    this.structureTreeModel.nodeChanged(node);*/
-
                 })
                 .setRemoveAction(anActionButton -> {
 
@@ -375,7 +361,7 @@ public class TemplateDetailsForm {
 
             DefaultMutableTreeNode selectedNode = ((DefaultMutableTreeNode) this.structureTree.getLastSelectedPathComponent());
 
-            if (selectedNode == null) {
+            if (selectedNode == null || selectedNode.isRoot()) {
                 this.detailsComponent.setContent(null);
                 toggleToolbarButtons(true, false, false);
                 return;

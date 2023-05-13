@@ -21,7 +21,11 @@ public abstract class BaseTemplateStructureSettingsAction extends BaseSettingsAc
     protected final DefaultTreeModel treeModel;
 
     public BaseTemplateStructureSettingsAction(@NotNull String name, @NotNull Tree tree, @NotNull Project project) {
-        super(name);
+        this(name, null, tree, project);
+    }
+
+    public BaseTemplateStructureSettingsAction(@NotNull String name, @Nullable Icon icon, Tree tree, Project project) {
+        super(name, icon);
         this.tree = tree;
         this.project = project;
         this.treeModel = (DefaultTreeModel) tree.getModel();

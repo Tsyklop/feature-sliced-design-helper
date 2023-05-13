@@ -1,5 +1,6 @@
 package design.featuresliced.helper.actions.settings.template;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.Tree;
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 public class CreateFileTemplateStructureSettingsAction extends BaseTemplateStructureSettingsAction {
 
     public CreateFileTemplateStructureSettingsAction(Tree tree, Project project) {
-        super("file", tree, project);
+        super("file", AllIcons.FileTypes.Text, tree, project);
     }
 
     @Override

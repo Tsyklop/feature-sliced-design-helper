@@ -67,8 +67,10 @@ public class TemplateStructureNode implements Comparable<TemplateStructureNode> 
         );
     }
 
-    public static TemplateStructureNode folderNode(@NotNull String name) {
-        return createNode(name, null, TemplateStructureNodeType.FOLDER);
+    public static TemplateStructureNode folderNode(@NotNull String name, @NotNull Set<TemplateStructureVariableType> variables) {
+        TemplateStructureNode node = createNode(name, null, TemplateStructureNodeType.FOLDER);
+        node.setVariables(variables);
+        return node;
     }
 
     private static TemplateStructureNode createNode(@NotNull String name,
