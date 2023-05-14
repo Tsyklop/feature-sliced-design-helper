@@ -25,8 +25,12 @@ public class ProjectTemplatesSettings {
         return templates;
     }
 
-    public void addTemplate(Template newTemplate) {
-        this.templates.add(newTemplate);
+    public void addTemplate(Template template) {
+        this.templates.add(template);
+    }
+
+    public void removeTemplate(Template toRemove) {
+        this.templates.removeIf(template -> template.getUuid().equals(toRemove.getUuid()));
     }
 
     public @NotNull Set<Template> getAllTemplates() {

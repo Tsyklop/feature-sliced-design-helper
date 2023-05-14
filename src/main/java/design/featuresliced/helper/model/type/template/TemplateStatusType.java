@@ -4,6 +4,7 @@ public enum TemplateStatusType {
 
     NEW,
     SAVED,
-    CHANGED;
+    CHANGED,
+    REMOVED;
 
 }

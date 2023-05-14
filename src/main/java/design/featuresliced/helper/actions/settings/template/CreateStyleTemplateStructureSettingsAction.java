@@ -23,7 +23,7 @@ public class CreateStyleTemplateStructureSettingsAction extends BaseTemplateStru
             return;
         }
 
-        insertNodeToTree(TemplateStructureNode.styleNode(dialog.getName(), dialog.getExtensionType()));
+        insertNodeToTree(TemplateStructureNode.styleNode(dialog.getName(), dialog.getExtensionType(), dialog.getUsedVariables()));
 
     }
 

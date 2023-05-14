@@ -51,11 +51,19 @@ public class ProjectTemplatesConfigurable implements SearchableConfigurable {
 
         List<Template> newTemplates = this.form.getNewTemplates();
 
-        for (Template newOrTemplate : newTemplates) {
-            this.projectTemplatesService.getState().addTemplate(newOrTemplate);
+        for (Template newTemplate : newTemplates) {
+            this.projectTemplatesService.getState().addTemplate(newTemplate);
+        }
+
+        List<Template> removedTemplates = this.form.getRemovedTemplates();
+
+        for (Template removedTemplate : removedTemplates) {
+            this.projectTemplatesService.getState().removeTemplate(removedTemplate);
         }
 
         this.projectTemplatesService.getState().markAllTemplatesAsSaved();
+
+        this.form.clearRemovedTemplates();
 
     }
 

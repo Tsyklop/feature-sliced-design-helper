@@ -5,11 +5,13 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import design.featuresliced.helper.gui.form.settings.templates.structure.TemplateStructureAddEditStyleForm;
 import design.featuresliced.helper.model.type.FileExtensionType;
+import design.featuresliced.helper.model.type.template.TemplateStructureVariableType;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.Set;
 
 public class TemplateStructureAddEditStyleDialog extends DialogWrapper {
 
@@ -23,7 +25,7 @@ public class TemplateStructureAddEditStyleDialog extends DialogWrapper {
                                                @Nullable FileExtensionType extensionType,
                                                @NotNull Project project) {
         super(project, false);
-        this.form = new TemplateStructureAddEditStyleForm(name, extensionType, FileExtensionType.FOR_STYLES);
+        this.form = new TemplateStructureAddEditStyleForm(project, name, extensionType, FileExtensionType.FOR_STYLES);
         init();
         initValidation();
         setTitle("Add style to structure");
@@ -43,6 +45,10 @@ public class TemplateStructureAddEditStyleDialog extends DialogWrapper {
 
     public FileExtensionType getExtensionType() {
         return (FileExtensionType) this.form.getExtensionComboBox().getSelectedItem();
+    }
+
+    public Set<TemplateStructureVariableType> getUsedVariables() {
+        return this.form.getNameTextField().getUsedVariables();
     }
 
     @Override

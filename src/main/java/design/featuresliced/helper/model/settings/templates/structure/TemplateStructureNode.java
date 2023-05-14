@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,42 +45,63 @@ public class TemplateStructureNode implements Comparable<TemplateStructureNode> 
     public TemplateStructureNode(@NotNull String name,
                                  @Nullable FileExtensionType extensionType,
                                  @NotNull TemplateStructureNodeType nodeType,
+                                 @NotNull Set<TemplateStructureVariableType> variables) {
+        this(name, extensionType, nodeType, new ArrayList<>(), variables);
+    }
+
+    public TemplateStructureNode(@NotNull String name,
+                                 @Nullable FileExtensionType extensionType,
+                                 @NotNull TemplateStructureNodeType nodeType,
                                  @NotNull List<TemplateStructureNode> nodes) {
+        this(name, extensionType, nodeType, nodes, Set.of());
+    }
+
+    public TemplateStructureNode(@NotNull String name,
+                                 @Nullable FileExtensionType extensionType,
+                                 @NotNull TemplateStructureNodeType nodeType,
+                                 @NotNull List<TemplateStructureNode> nodes,
+                                 @NotNull Set<TemplateStructureVariableType> variables) {
         this.name = Objects.requireNonNull(name);
         this.nodes = Objects.requireNonNull(nodes);
         this.nodeType = Objects.requireNonNull(nodeType);
+        this.variables = variables;
         this.extensionType = extensionType;
     }
 
-    public static TemplateStructureNode fileNode(@NotNull String name, @NotNull FileExtensionType extensionType) {
+    public static TemplateStructureNode layerNode() {
         return createNode(
-                name,
-                extensionType,
-                TemplateStructureNodeType.FILE
+                TemplateStructureVariableType.LAYER_NAME.valueToVariable(),
+                null,
+                TemplateStructureNodeType.ROOT,
+                Set.of(TemplateStructureVariableType.LAYER_NAME)
         );
     }
 
-    public static TemplateStructureNode styleNode(@NotNull String name, @NotNull FileExtensionType extensionType) {
-        return createNode(
-                name,
-                extensionType,
-                TemplateStructureNodeType.STYLE
-        );
+    public static TemplateStructureNode fileNode(@NotNull String name,
+                                                 @NotNull FileExtensionType extensionType,
+                                                 @NotNull Set<TemplateStructureVariableType> variables) {
+        return createNode(name, extensionType, TemplateStructureNodeType.FILE, variables);
+    }
+
+    public static TemplateStructureNode styleNode(@NotNull String name,
+                                                  @NotNull FileExtensionType extensionType,
+                                                  @NotNull Set<TemplateStructureVariableType> variables) {
+        return createNode(name, null, TemplateStructureNodeType.STYLE, variables);
     }
 
     public static TemplateStructureNode folderNode(@NotNull String name, @NotNull Set<TemplateStructureVariableType> variables) {
-        TemplateStructureNode node = createNode(name, null, TemplateStructureNodeType.FOLDER);
-        node.setVariables(variables);
-        return node;
+        return createNode(name, null, TemplateStructureNodeType.FOLDER, variables);
     }
 
     private static TemplateStructureNode createNode(@NotNull String name,
                                                     @Nullable FileExtensionType extensionType,
-                                                    @NotNull TemplateStructureNodeType type) {
+                                                    @NotNull TemplateStructureNodeType type,
+                                                    @NotNull Set<TemplateStructureVariableType> variables) {
         return new TemplateStructureNode(
                 name,
                 extensionType,
-                type
+                type,
+                variables
         );
     }
 
@@ -167,6 +189,14 @@ public class TemplateStructureNode implements Comparable<TemplateStructureNode> 
             return Optional.empty();
         }
         return Optional.of(extensionType != null ? String.join(",", extensionType.getValues()) : "");
+    }
+
+    public Set<TemplateStructureVariableType> getAllVariables() {
+        Set<TemplateStructureVariableType> variables = new HashSet<>(getVariables());
+        for (TemplateStructureNode node : nodes) {
+            variables.addAll(node.getAllVariables());
+        }
+        return variables;
     }
 
 }

@@ -4,10 +4,10 @@ import design.featuresliced.helper.gui.form.BaseForm;
 import design.featuresliced.helper.gui.model.FormError;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
+
 public interface BaseFsdForm extends BaseForm {
 
-    String getName();
-
-    @Nullable FormError validate(/*@NotNull VirtualFile baseDir*/);
+    @Nullable FormError validate();
 
 }

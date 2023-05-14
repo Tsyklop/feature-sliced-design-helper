@@ -25,7 +25,7 @@ public class TemplateDeleteConfirmDialog extends DialogWrapper {
     protected @Nullable JComponent createCenterPanel() {
         JPanel dialogPanel = new JPanel(new BorderLayout());
         JLabel label = new JLabel("Deleting \"" + this.template.getName() + "\" template. Are you sure?");
-        label.setFont(JBUI.Fonts.label(20));
+        label.setFont(JBUI.Fonts.label(16));
         dialogPanel.add(label, BorderLayout.CENTER);
         return dialogPanel;
     }

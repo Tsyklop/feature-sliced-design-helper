@@ -4,7 +4,9 @@ public enum FormErrorType {
 
     NAME_INCORRECT("Please enter a name"),
     ALREADY_EXISTS("Already exists"),
-    SEGMENT_NOT_SELECTED("Select at least one segment");
+    TEXT_FIELD_EMPTY("Please enter a value"),
+    SEGMENT_NOT_SELECTED("Select at least one segment"),
+    TEMPLATE_NOT_SELECTED("Select template");
 
     private final String message;
 

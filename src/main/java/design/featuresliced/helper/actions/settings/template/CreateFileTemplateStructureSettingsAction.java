@@ -23,7 +23,7 @@ public class CreateFileTemplateStructureSettingsAction extends BaseTemplateStruc
             return;
         }
 
-        insertNodeToTree(TemplateStructureNode.fileNode(dialog.getName(), dialog.getExtensionType()));
+        insertNodeToTree(TemplateStructureNode.fileNode(dialog.getName(), dialog.getExtensionType(), dialog.getUsedVariables()));
 
     }
 

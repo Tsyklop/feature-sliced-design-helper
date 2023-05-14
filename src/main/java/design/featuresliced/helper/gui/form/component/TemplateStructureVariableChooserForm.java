@@ -22,7 +22,12 @@ public class TemplateStructureVariableChooserForm {
 
     public TemplateStructureVariableChooserForm(Set<TemplateStructureVariableType> usedVariables) {
 
-        DefaultTableModel tableModel = new DefaultTableModel(new String[]{"Name", "Description"}, 0);
+        DefaultTableModel tableModel = new DefaultTableModel(new String[]{"Name", "Description"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
 
         for (TemplateStructureVariableType variableType : TemplateStructureVariableType.values()) {
             /*if (usedVariables.contains(variableType)) {

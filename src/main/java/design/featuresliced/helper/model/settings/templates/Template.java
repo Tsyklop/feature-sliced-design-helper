@@ -3,10 +3,13 @@ package design.featuresliced.helper.model.settings.templates;
 import design.featuresliced.helper.model.settings.templates.structure.TemplateStructureNode;
 import design.featuresliced.helper.model.type.template.TemplateStatusType;
 import design.featuresliced.helper.model.type.fsd.LayerType;
+import design.featuresliced.helper.model.type.template.TemplateStructureVariableType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 public class Template implements Comparable<Template> {
@@ -98,12 +101,20 @@ public class Template implements Comparable<Template> {
         this.status = TemplateStatusType.CHANGED;
     }
 
+    public void changeStatusToRemovedIfPossible() {
+        this.status = TemplateStatusType.REMOVED;
+    }
+
     public boolean isNew() {
         return this.status == TemplateStatusType.NEW;
     }
 
     public boolean isChanged() {
         return this.status == TemplateStatusType.CHANGED;
+    }
+
+    public boolean isRemoved() {
+        return this.status == TemplateStatusType.REMOVED;
     }
 
     public boolean isNewOrChanged() {
@@ -118,12 +129,8 @@ public class Template implements Comparable<Template> {
         this.rootNode = rootNode;
     }
 
-    private Template setUuid() {
-        if (this.uuid != null) {
-            throw new IllegalStateException();
-        }
-        this.uuid = UUID.randomUUID().toString();
-        return this;
+    public Set<TemplateStructureVariableType> getUsedVariables() {
+        return new HashSet<>(this.rootNode.getAllVariables());
     }
 
     @Override
@@ -142,6 +149,14 @@ public class Template implements Comparable<Template> {
     @Override
     public int compareTo(@NotNull Template o) {
         return this.name.compareTo(o.getName());
+    }
+
+    private Template setUuid() {
+        if (this.uuid != null) {
+            throw new IllegalStateException();
+        }
+        this.uuid = UUID.randomUUID().toString();
+        return this;
     }
 
 }

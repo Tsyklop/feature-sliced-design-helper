@@ -19,13 +19,14 @@ import design.featuresliced.helper.actions.settings.toolbar.TemplatesToolbarPast
 import design.featuresliced.helper.gui.dialog.settings.TemplateAddEditDialog;
 import design.featuresliced.helper.gui.dialog.settings.confirm.TemplateDeleteConfirmDialog;
 import design.featuresliced.helper.model.settings.templates.Template;
-import design.featuresliced.helper.model.type.template.TemplateStatusType;
 import design.featuresliced.helper.model.type.fsd.LayerType;
+import design.featuresliced.helper.model.type.template.TemplateStatusType;
 import design.featuresliced.helper.service.ProjectTemplatesService;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class TemplatesSettingsForm {
@@ -51,6 +52,8 @@ public class TemplatesSettingsForm {
     private AnActionButton copyActionButton;
 
     private AnActionButton pasteActionButton;
+
+    private java.util.List<Template> removedTemplates = new ArrayList<>();
 
     public TemplatesSettingsForm(Project project) {
         this.project = project;
@@ -92,10 +95,7 @@ public class TemplatesSettingsForm {
     }
 
     public boolean isModified() {
-        return this.templatesListModel.getItems()
-                .stream()
-                .anyMatch(template -> template.getStatus() == TemplateStatusType.NEW
-                        || template.getStatus() == TemplateStatusType.CHANGED);
+        return !this.removedTemplates.isEmpty() || this.templatesListModel.getItems().stream().anyMatch(Template::isNewOrChanged);
     }
 
     public java.util.List<Template> getNewTemplates() {
@@ -105,11 +105,12 @@ public class TemplatesSettingsForm {
                 .toList();
     }
 
-    public java.util.List<Template> getNewOrChangedTemplates() {
-        return this.templatesListModel.getItems()
-                .stream()
-                .filter(Template::isNewOrChanged)
-                .toList();
+    public java.util.List<Template> getRemovedTemplates() {
+        return this.removedTemplates;
+    }
+
+    public void clearRemovedTemplates() {
+        this.removedTemplates.clear();
     }
 
     private void createUIComponents() {
@@ -212,8 +213,10 @@ public class TemplatesSettingsForm {
                     }
 
                     if (new TemplateDeleteConfirmDialog(template, project, splitter).showAndGet()) {
+                        template.changeStatusToRemovedIfPossible();
                         this.templatesList.getSelectionModel().clearSelection();
                         this.templatesListModel.remove(template);
+                        this.removedTemplates.add(template);
                     }
 
                 })

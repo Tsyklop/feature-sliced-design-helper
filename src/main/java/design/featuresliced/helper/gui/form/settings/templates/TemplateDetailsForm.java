@@ -439,7 +439,7 @@ public class TemplateDetailsForm {
         if (template != null) {
 
             if (template.isNew()) {
-                template.setRootNode(new TemplateStructureNode("<layerName>", TemplateStructureNodeType.ROOT));
+                template.setRootNode(TemplateStructureNode.layerNode());
             }
 
             DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(template.getRootNode());

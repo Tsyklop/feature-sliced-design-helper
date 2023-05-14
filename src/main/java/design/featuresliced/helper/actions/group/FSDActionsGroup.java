@@ -8,13 +8,12 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import design.featuresliced.helper.actions.slice.NewEntityAction;
-import design.featuresliced.helper.actions.slice.NewFeatureAction;
-import design.featuresliced.helper.actions.slice.NewPageAction;
-import design.featuresliced.helper.actions.slice.NewWidgetAction;
+import design.featuresliced.helper.actions.creation.slice.NewEntityCreationAction;
+import design.featuresliced.helper.actions.creation.slice.NewFeatureCreationAction;
+import design.featuresliced.helper.actions.creation.slice.NewPageCreationAction;
+import design.featuresliced.helper.actions.creation.slice.NewWidgetCreationAction;
 import design.featuresliced.helper.model.type.fsd.LayerType;
 import design.featuresliced.helper.service.ProjectGeneralService;
-import icons.FSDIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -94,19 +93,19 @@ public class FSDActionsGroup extends ActionGroup {
     }
 
     private @NotNull AnAction buildCreatePageAction() {
-        return new NewPageAction("Create Page", "Create new page", FSDIcons.MAIN_ICON);
+        return new NewPageCreationAction();
     }
 
     private @NotNull AnAction buildCreateEntityAction() {
-        return new NewEntityAction("Create Entity", "Create new entity", FSDIcons.MAIN_ICON);
+        return new NewEntityCreationAction();
     }
 
     private @NotNull AnAction buildCreateWidgetAction() {
-        return new NewWidgetAction("Create Widget", "Create new widget", FSDIcons.MAIN_ICON);
+        return new NewWidgetCreationAction();
     }
 
     private @NotNull AnAction buildCreateFeatureAction() {
-        return new NewFeatureAction("Create Feature", "Create new feature", FSDIcons.MAIN_ICON);
+        return new NewFeatureCreationAction();
     }
 
     private @NotNull AnAction buildCreateSharedAction() {

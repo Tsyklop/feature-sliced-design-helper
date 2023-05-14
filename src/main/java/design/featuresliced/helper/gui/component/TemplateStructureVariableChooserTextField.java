@@ -66,6 +66,14 @@ public class TemplateStructureVariableChooserTextField extends ExtendableTextFie
             @Override
             public void changedUpdate(DocumentEvent e) {
 
+                String value = TemplateStructureVariableChooserTextField.super.getText();
+
+                for (TemplateStructureVariableType variableType : TemplateStructureVariableType.values()) {
+                    if (!value.contains(variableType.valueToVariable())) {
+                        usedVariables.remove(variableType);
+                    }
+                }
+
             }
         });
 

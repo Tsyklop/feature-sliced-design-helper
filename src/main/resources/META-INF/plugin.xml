@@ -16,18 +16,20 @@
     <depends>JavaScript</depends>
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.platform</depends>
-
+    
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
 
-        <notificationGroup id="fsd-idea"
+        <notificationGroup id="feature-sliced-design-helper-notify-group"
                            key="notification.group"
                            bundle="messages.FSDBundle"
                            displayType="BALLOON"
                            toolWindowId="Project"
         />
 
+        <postStartupActivity implementation="design.featuresliced.helper.ProjectOpenedActivity"/>
+        
         <projectService serviceImplementation="design.featuresliced.helper.service.ProjectGeneralService"/>
         <projectService serviceImplementation="design.featuresliced.helper.service.ProjectTemplatesService"/>
 
