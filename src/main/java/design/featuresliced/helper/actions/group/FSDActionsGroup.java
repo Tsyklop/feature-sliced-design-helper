@@ -40,7 +40,17 @@ public class FSDActionsGroup extends ActionGroup {
             return;
         }
 
-        e.getPresentation().setVisible(isSourcesRootOrProjectRoot(project, selectedFile) || LayerType.valueOfOptional(selectedFile.getName().toUpperCase()).isPresent());
+        VirtualFile sourcesRoot = ProjectGeneralService.getInstance(project).getSourcesRoot();
+
+        e.getPresentation().setEnabled(sourcesRoot != null);
+        e.getPresentation().setDescription(sourcesRoot != null ? "Specify sources root in settings" : "Creates fsd things");
+
+        if (sourcesRoot != null) {
+            e.getPresentation().setVisible(
+                    isSourcesRootOrProjectRoot(project, sourcesRoot, selectedFile)
+                            || LayerType.valueOfOptional(selectedFile.getName().toUpperCase()).isPresent()
+            );
+        }
 
     }
 
@@ -59,7 +69,13 @@ public class FSDActionsGroup extends ActionGroup {
             return EMPTY_ACTIONS;
         }
 
-        if (isSourcesRootOrProjectRoot(project, selectedFile)) {
+        VirtualFile sourcesRoot = ProjectGeneralService.getInstance(project).getSourcesRoot();
+
+        if (sourcesRoot == null) {
+            return EMPTY_ACTIONS;
+        }
+
+        if (isSourcesRootOrProjectRoot(project, sourcesRoot, selectedFile)) {
             return buildAllActionsArray();
         }
 
@@ -76,9 +92,8 @@ public class FSDActionsGroup extends ActionGroup {
 
     }
 
-    private boolean isSourcesRootOrProjectRoot(Project project, VirtualFile selectedFile) {
-        return (project.getBasePath() != null && project.getBasePath().equals(selectedFile.getPath()))
-                || ProjectGeneralService.getInstance(project).getSourcesRoot().getPath().equals(selectedFile.getPath());
+    private boolean isSourcesRootOrProjectRoot(Project project, VirtualFile sourcesRoot, VirtualFile selectedFile) {
+        return (project.getBasePath() != null && project.getBasePath().equals(selectedFile.getPath())) || sourcesRoot.getPath().equals(selectedFile.getPath());
     }
 
     private @NotNull AnAction[] buildAllActionsArray() {

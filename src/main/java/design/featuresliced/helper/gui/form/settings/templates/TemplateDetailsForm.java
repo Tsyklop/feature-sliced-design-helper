@@ -3,19 +3,30 @@ package design.featuresliced.helper.gui.form.settings.templates;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.icons.AllIcons;
 import com.intellij.lang.javascript.JavaScriptFileType;
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbarPosition;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.actionSystem.IdeActions;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
-import com.intellij.openapi.editor.impl.DocumentImpl;
+import com.intellij.openapi.editor.event.EditorMouseEvent;
+import com.intellij.openapi.editor.impl.ContextMenuPopupHandler;
+import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DetailsComponent;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.EditorTextField;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.OnePixelSplitter;
 import com.intellij.ui.ToolbarDecorator;
@@ -26,14 +37,16 @@ import com.intellij.util.PlatformIcons;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.TextTransferable;
 import design.featuresliced.helper.actions.group.TemplateStructureCreateActionGroup;
+import design.featuresliced.helper.gui.dialog.component.TemplateStructureVariableChooserDialog;
+import design.featuresliced.helper.gui.dialog.settings.confirm.TemplateStructureNodeDeleteConfirmDialog;
 import design.featuresliced.helper.gui.dialog.settings.structure.TemplateStructureAddEditFileDialog;
 import design.featuresliced.helper.gui.dialog.settings.structure.TemplateStructureAddEditFolderDialog;
-import design.featuresliced.helper.gui.dialog.settings.confirm.TemplateStructureNodeDeleteConfirmDialog;
 import design.featuresliced.helper.gui.dialog.settings.structure.TemplateStructureAddEditStyleDialog;
 import design.featuresliced.helper.model.settings.templates.Template;
-import design.featuresliced.helper.model.settings.templates.structure.TemplateStructureNode;
+import design.featuresliced.helper.model.settings.templates.TemplateStructureNode;
+import design.featuresliced.helper.model.settings.templates.TemplateStructureNodeTemplate;
 import design.featuresliced.helper.model.type.FileExtensionType;
-import design.featuresliced.helper.model.type.template.TemplateStructureNodeType;
+import design.featuresliced.helper.util.TemplateStructureUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,9 +65,12 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-public class TemplateDetailsForm {
+public class TemplateDetailsForm implements Disposable {
 
     private static final Logger log = Logger.getInstance(TemplateDetailsForm.class);
 
@@ -67,6 +83,8 @@ public class TemplateDetailsForm {
     private final DetailsComponent detailsComponent;
 
     private final DefaultTreeModel structureTreeModel;
+
+    private final EditorContextMenuPopupHandler editorContextMenuPopupHandler;
 
     private Tree structureTree;
 
@@ -93,9 +111,13 @@ public class TemplateDetailsForm {
                 return false;
             }
         };
+        this.editorTextField.setOneLineMode(false);
+        this.editorTextField.setFont(JBUI.Fonts.label(13));
+
         this.detailsComponent = new DetailsComponent(false, true);
         this.detailsComponent.getContentGutter().getInsets().set(0, 5, 0, 5);
         this.structureTreeModel = new DefaultTreeModel(null);
+        this.editorContextMenuPopupHandler = new EditorContextMenuPopupHandler(editorTextField);
 
         $$$setupUI$$$();
 
@@ -135,8 +157,9 @@ public class TemplateDetailsForm {
         return root;
     }
 
-    public JBSplitter getSplitter() {
-        return splitter;
+    @Override
+    public void dispose() {
+        Disposer.dispose(this);
     }
 
     private void createUIComponents() {
@@ -221,7 +244,7 @@ public class TemplateDetailsForm {
 
         JPanel rightPanel = new JPanel(new BorderLayout());
 
-        rightPanel.add(new Label("File Template"), BorderLayout.PAGE_START);
+        rightPanel.add(new Label("File Template (You can insert variable with Right Mouse Button -> Insert variable)"), BorderLayout.PAGE_START);
         rightPanel.add(this.detailsComponent.getComponent(), BorderLayout.CENTER);
 
         this.splitter.setSecondComponent(rightPanel);
@@ -232,6 +255,7 @@ public class TemplateDetailsForm {
 
         ToolbarDecorator toolbarDecorator = ToolbarDecorator.createDecorator(tree)
                 .initPosition()
+                .setAddActionName("Create structure node")
                 .setAddAction(anActionButton -> {
 
                     ListPopup listPopup = JBPopupFactory.getInstance()
@@ -251,6 +275,7 @@ public class TemplateDetailsForm {
                     listPopup.show(anActionButton.getPreferredPopupPoint());
 
                 })
+                .setEditActionName("Edit structure node")
                 .setEditAction(anActionButton -> {
 
                     TreePath parentPath = structureTree.getSelectionPath();
@@ -302,6 +327,7 @@ public class TemplateDetailsForm {
                     }
 
                 })
+                .setRemoveActionName("Remove structure node")
                 .setRemoveAction(anActionButton -> {
 
                     TreePath parentPath = structureTree.getSelectionPath();
@@ -323,16 +349,6 @@ public class TemplateDetailsForm {
 
         return toolbarDecorator.createPanel();
 
-    }
-
-    private void updateTemplateStructureNode(TemplateStructureNode templateStructureNode,
-                                             String updatedName,
-                                             FileExtensionType updatedExtensionType) {
-        templateStructureNode.setName(updatedName);
-        if (updatedExtensionType != null) {
-            templateStructureNode.setExtensionType(updatedExtensionType);
-        }
-        template.changeStatusToChangedIfPossible();
     }
 
     private Tree initStructureTree(TreeModel treeModel) {
@@ -386,14 +402,27 @@ public class TemplateDetailsForm {
 
             this.editorTextField.setNewDocumentAndFileType(
                     JavaScriptFileType.INSTANCE,
-                    new DocumentImpl(Optional.ofNullable(templateStructureNode.getTemplate()).orElse(""))
+                    EditorFactory.getInstance().createDocument(
+                            Optional.ofNullable(templateStructureNode.getTemplate())
+                                    .map(TemplateStructureNodeTemplate::getValue)
+                                    .orElse("")
+                    )
             );
 
             this.templateDocumentListener = new DocumentListener() {
                 @Override
                 public void documentChanged(@NotNull DocumentEvent event) {
                     log.info("Document changed");
-                    templateStructureNode.setTemplate(event.getDocument().getText());
+
+                    TemplateStructureNodeTemplate nodeTemplate = templateStructureNode.getTemplate();
+
+                    if (nodeTemplate == null) {
+                        nodeTemplate = new TemplateStructureNodeTemplate();
+                        templateStructureNode.setTemplate(nodeTemplate);
+                    }
+
+                    nodeTemplate.setValueAndParseVariables(event.getDocument().getText());
+
                     template.changeStatusToChangedIfPossible();
                 }
             };
@@ -415,8 +444,15 @@ public class TemplateDetailsForm {
             this.detailsComponent.setContent(jPanel);
 
             if (this.editorTextField.getEditor() != null) {
+
                 this.editorTextField.getEditor().setBorder(JBUI.Borders.empty());
                 this.editorTextField.getEditor().getInsets().set(0, 0, 0, 0);
+
+                if (this.editorTextField.getEditor() instanceof EditorImpl editor) {
+                    editor.uninstallPopupHandler(this.editorContextMenuPopupHandler);
+                    editor.installPopupHandler(this.editorContextMenuPopupHandler);
+                }
+
             }
 
         });
@@ -439,14 +475,18 @@ public class TemplateDetailsForm {
         if (template != null) {
 
             if (template.isNew()) {
-                template.setRootNode(TemplateStructureNode.layerNode());
+                if (template.getRootNode() == null) {
+                    template.setRootNode(TemplateStructureNode.layerNode());
+                }
             }
 
             DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(template.getRootNode());
 
-            populateNodesTree(rootNode, template.getRootNode().getNodes());
+            TemplateStructureUtil.populateNodesTree(rootNode, template.getRootNode().getNodes());
 
             this.structureTreeModel.setRoot(rootNode);
+
+            TemplateStructureUtil.expandAllTreeNodes(this.structureTree, 0, this.structureTree.getRowCount());
 
         } else {
             this.detailsComponent.setText("New template");
@@ -459,15 +499,16 @@ public class TemplateDetailsForm {
         toggleToolbarButtons(false);
     }
 
-    private void populateNodesTree(DefaultMutableTreeNode rootNode, java.util.List<TemplateStructureNode> nodes) {
-
-        for (TemplateStructureNode node : nodes) {
-            DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(node);
-            populateNodesTree(treeNode, node.getNodes());
-            rootNode.add(treeNode);
+    private void updateTemplateStructureNode(TemplateStructureNode templateStructureNode,
+                                             String updatedName,
+                                             FileExtensionType updatedExtensionType) {
+        templateStructureNode.setName(updatedName);
+        if (updatedExtensionType != null) {
+            templateStructureNode.setExtensionType(updatedExtensionType);
         }
-
+        template.changeStatusToChangedIfPossible();
     }
+
 
     private static class StructureTransferHandler extends TransferHandler {
 
@@ -527,18 +568,13 @@ public class TemplateDetailsForm {
 
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
 
-            if (node.getUserObject() == null) {
+            if (node.isRoot() || node.getUserObject() == null) {
                 return false;
             }
 
             TemplateStructureNode structureNode = ((TemplateStructureNode) node.getUserObject());
 
             return structureNode.getNodeType().isFolderOrRoot();
-        }
-
-        @Override
-        protected void exportDone(JComponent source, Transferable data, int action) {
-            movingNode = null;
         }
 
         public boolean importData(TransferSupport info) {
@@ -568,9 +604,14 @@ public class TemplateDetailsForm {
                 childIndex = structureTreeModel.getChildCount(path.getLastPathComponent());
             }
 
-            // create a new node to represent the data and insert it into the model
-            DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(data);
             DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
+
+            // create a new node to represent the data and insert it into the model
+
+            DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(data);
+
+            TemplateStructureUtil.populateNodesTree(newNode, data.getNodes());
+
             structureTreeModel.insertNodeInto(newNode, parentNode, childIndex);
 
             // make the new node visible and scroll so that it's visible
@@ -582,8 +623,16 @@ public class TemplateDetailsForm {
                 movingNode = null;
             }
 
+            TemplateStructureUtil.expandAllTreeNodes(this.structureTree, 0, this.structureTree.getRowCount());
+
             return true;
         }
+
+        @Override
+        protected void exportDone(JComponent source, Transferable data, int action) {
+            movingNode = null;
+        }
+
     }
 
     private static class StructureTreeCellRenderer extends DefaultTreeCellRenderer {
@@ -609,6 +658,82 @@ public class TemplateDetailsForm {
             return this;
         }
 
+    }
+
+    private static class EditorContextMenuPopupHandler extends ContextMenuPopupHandler.Simple {
+
+        private final EditorTextField editorTextField;
+
+        public EditorContextMenuPopupHandler(EditorTextField editorTextField) {
+            super(IdeActions.GROUP_BASIC_EDITOR_POPUP);
+            this.editorTextField = editorTextField;
+        }
+
+        @Override
+        public @Nullable ActionGroup getActionGroup(@NotNull EditorMouseEvent event) {
+            return new TemplateActionGroup(Arrays.stream(super.getActionGroup(event).getChildren(null)).collect(Collectors.toList()), editorTextField);
+        }
+    }
+
+    private static class TemplateActionGroup extends DefaultActionGroup {
+
+        private final EditorTextField editorTextField;
+
+        public TemplateActionGroup(@NotNull List<? extends AnAction> actions, EditorTextField editorTextField) {
+            super(actions);
+            this.editorTextField = editorTextField;
+        }
+
+        @Override
+        public AnAction @NotNull [] getChildren(@Nullable AnActionEvent e) {
+
+            AnAction[] defaultActions = super.getChildren(e);
+
+            AnAction[] actions = new AnAction[defaultActions.length + 1];
+
+            System.arraycopy(defaultActions, 0, actions, 0, defaultActions.length);
+
+            actions[actions.length - 1] = new InsertVariableAction(editorTextField);
+
+            return actions;
+
+        }
+    }
+
+    private static class InsertVariableAction extends AnAction {
+
+        private final EditorTextField editorTextField;
+
+        public InsertVariableAction(EditorTextField editorTextField) {
+            super("Insert variable", "", PlatformIcons.VARIABLE_ICON);
+            this.editorTextField = editorTextField;
+        }
+
+        @Override
+        public void actionPerformed(@NotNull AnActionEvent e) {
+
+            TemplateStructureVariableChooserDialog dialog = new TemplateStructureVariableChooserDialog(e.getProject(), null, java.util.Set.of());
+
+            if (!dialog.showAndGet()) {
+                return;
+            }
+
+            ApplicationManager.getApplication().runWriteAction(() -> {
+
+                Document document = this.editorTextField.getDocument();
+
+                StringBuilder oldText = new StringBuilder(document.getText());
+
+                oldText.insert(
+                        this.editorTextField.getCaretModel().getCurrentCaret().getSelectionEnd(),
+                        dialog.getSelectedVariableType().valueToVariableName()
+                );
+
+                document.setText(oldText.toString());
+
+            });
+
+        }
     }
 
 }

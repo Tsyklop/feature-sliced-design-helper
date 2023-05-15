@@ -1,5 +1,6 @@
-package design.featuresliced.helper.model.settings.templates.structure;
+package design.featuresliced.helper.model.settings.templates;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import design.featuresliced.helper.model.type.FileExtensionType;
 import design.featuresliced.helper.model.type.template.TemplateStructureNodeType;
 import design.featuresliced.helper.model.type.template.TemplateStructureVariableType;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -17,13 +19,15 @@ public class TemplateStructureNode implements Comparable<TemplateStructureNode> 
 
     private String name;
 
-    private String template;
+    //private String template;
 
     private FileExtensionType extensionType;
 
     private List<TemplateStructureNode> nodes;
 
     private TemplateStructureNodeType nodeType;
+
+    private TemplateStructureNodeTemplate template;
 
     private Set<TemplateStructureVariableType> variables;
 
@@ -70,7 +74,7 @@ public class TemplateStructureNode implements Comparable<TemplateStructureNode> 
 
     public static TemplateStructureNode layerNode() {
         return createNode(
-                TemplateStructureVariableType.LAYER_NAME.valueToVariable(),
+                TemplateStructureVariableType.LAYER_NAME.valueToVariableName(),
                 null,
                 TemplateStructureNodeType.ROOT,
                 Set.of(TemplateStructureVariableType.LAYER_NAME)
@@ -86,7 +90,7 @@ public class TemplateStructureNode implements Comparable<TemplateStructureNode> 
     public static TemplateStructureNode styleNode(@NotNull String name,
                                                   @NotNull FileExtensionType extensionType,
                                                   @NotNull Set<TemplateStructureVariableType> variables) {
-        return createNode(name, null, TemplateStructureNodeType.STYLE, variables);
+        return createNode(name, extensionType, TemplateStructureNodeType.STYLE, variables);
     }
 
     public static TemplateStructureNode folderNode(@NotNull String name, @NotNull Set<TemplateStructureVariableType> variables) {
@@ -125,11 +129,11 @@ public class TemplateStructureNode implements Comparable<TemplateStructureNode> 
         this.name = name;
     }
 
-    public String getTemplate() {
+    public TemplateStructureNodeTemplate getTemplate() {
         return template;
     }
 
-    public void setTemplate(String template) {
+    public void setTemplate(TemplateStructureNodeTemplate template) {
         this.template = template;
     }
 
@@ -157,8 +161,67 @@ public class TemplateStructureNode implements Comparable<TemplateStructureNode> 
         return variables;
     }
 
+    /*public Set<TemplateStructureVariableType> getTemplateVariables() {
+        if (StringUtils.isEmpty(this.template)) {
+            return Set.of();
+        }
+
+        Set<TemplateStructureVariableType> templateVariables = new HashSet<>(getVariables());
+
+        for (TemplateStructureVariableType variableType : TemplateStructureVariableType.values()) {
+            if (this.template.contains(variableType.valueToVariableName())) {
+                templateVariables.add(variableType);
+            }
+        }
+
+        return templateVariables;
+
+    }*/
+
     public void setVariables(Set<TemplateStructureVariableType> variables) {
         this.variables = variables;
+    }
+
+    @JsonIgnore
+    public Set<TemplateStructureVariableType> getAllVariables() {
+        Set<TemplateStructureVariableType> variables = new HashSet<>(getVariables());
+        if (getTemplate() != null) {
+            variables.addAll(getTemplate().getVariables());
+        }
+        for (TemplateStructureNode node : nodes) {
+            variables.addAll(node.getAllVariables());
+        }
+        return variables;
+    }
+
+    @JsonIgnore
+    public String getFilledName(Map<TemplateStructureVariableType, String> variableValueByType) {
+        StringBuilder sb = new StringBuilder(this.name);
+
+        for (TemplateStructureVariableType variableType : this.variables) {
+
+            String variableName = variableType.valueToVariableName();
+
+            int variableIndex = 0;
+
+            do {
+
+                variableIndex = sb.indexOf(variableName, variableIndex);
+
+                if (variableIndex >= 0) {
+                    sb.replace(variableIndex, variableIndex + variableName.length(), variableValueByType.get(variableType));
+                }
+
+            } while (variableIndex >= 0);
+
+        }
+
+        return sb.toString();
+    }
+
+    @JsonIgnore
+    public String getFilledNameWithExtension(Map<TemplateStructureVariableType, String> variableValueByType) {
+        return getFilledName(variableValueByType) + Optional.ofNullable(extensionType).map(FileExtensionType::getValue).orElse("");
     }
 
     @Override
@@ -188,15 +251,7 @@ public class TemplateStructureNode implements Comparable<TemplateStructureNode> 
         if (!nodeType.isFile()) {
             return Optional.empty();
         }
-        return Optional.of(extensionType != null ? String.join(",", extensionType.getValues()) : "");
-    }
-
-    public Set<TemplateStructureVariableType> getAllVariables() {
-        Set<TemplateStructureVariableType> variables = new HashSet<>(getVariables());
-        for (TemplateStructureNode node : nodes) {
-            variables.addAll(node.getAllVariables());
-        }
-        return variables;
+        return Optional.ofNullable(extensionType).map(FileExtensionType::getValue);
     }
 
 }

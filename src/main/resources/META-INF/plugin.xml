@@ -53,7 +53,7 @@
     <actions>
 
         <group id="design.featuresliced.helper.actions.group.FSDActionsGroup"
-               text="Feature Sliced Design"
+               text="Feature-Sliced Design"
                class="design.featuresliced.helper.actions.group.FSDActionsGroup"
                popup="true"
                icon="FSDIcons.MAIN_ICON">

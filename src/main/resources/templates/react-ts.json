@@ -1,0 +1,64 @@
+{
+  "PAGES": [
+    {
+      "name": "Simple Page (TS)",
+      "layer": "PAGES",
+      "rootNode": {
+        "name": "$$layerName$$",
+        "extensionType": null,
+        "nodes": [
+          {
+            "name": "$$sliceOrSegmentName$$",
+            "extensionType": null,
+            "nodes": [
+              {
+                "name": "index",
+                "extensionType": "TS",
+                "nodes": [],
+                "nodeType": "FILE",
+                "template": {
+                  "value": "export { $$componentName$$ } from './page';",
+                  "variables": [
+                    "COMPONENT_NAME"
+                  ]
+                },
+                "variables": []
+              },
+              {
+                "name": "model",
+                "extensionType": "TS",
+                "nodes": [],
+                "nodeType": "FILE",
+                "template": null,
+                "variables": []
+              },
+              {
+                "name": "page",
+                "extensionType": "TSX",
+                "nodes": [],
+                "nodeType": "FILE",
+                "template": {
+                  "value": "export const $$componentName$$ = () => {\n    return null;\n}",
+                  "variables": [
+                    "COMPONENT_NAME"
+                  ]
+                },
+                "variables": []
+              }
+            ],
+            "nodeType": "FOLDER",
+            "template": null,
+            "variables": [
+              "SLICE_OR_SEGMENT_NAME"
+            ]
+          }
+        ],
+        "nodeType": "ROOT",
+        "template": null,
+        "variables": [
+          "LAYER_NAME"
+        ]
+      }
+    }
+  ]
+}

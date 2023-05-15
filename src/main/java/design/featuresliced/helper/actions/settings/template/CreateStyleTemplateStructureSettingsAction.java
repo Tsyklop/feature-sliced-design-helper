@@ -5,7 +5,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.Tree;
 import design.featuresliced.helper.gui.dialog.settings.structure.TemplateStructureAddEditStyleDialog;
-import design.featuresliced.helper.model.settings.templates.structure.TemplateStructureNode;
+import design.featuresliced.helper.model.settings.templates.TemplateStructureNode;
 import org.jetbrains.annotations.NotNull;
 
 public class CreateStyleTemplateStructureSettingsAction extends BaseTemplateStructureSettingsAction {

@@ -23,8 +23,12 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ItemEvent;
-import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SliceAddForm implements BaseSliceForm {
 
@@ -32,7 +36,7 @@ public class SliceAddForm implements BaseSliceForm {
 
     private final DetailsComponent detailsComponent;
 
-    private final java.util.List<JTextField> variablesTextFields = new ArrayList<>();
+    private final Map<TemplateStructureVariableType, JTextField> variablesTextFieldsByType = new HashMap<>();
 
     private JPanel root;
 
@@ -108,6 +112,18 @@ public class SliceAddForm implements BaseSliceForm {
         return this.layerType;
     }
 
+    public Optional<Template> getSelectedTemplate() {
+        return Optional.ofNullable(templatesComboBox.getSelectedItem())
+                .map(o -> (TemplateComboBoxValue) o)
+                .map(TemplateComboBoxValue::template);
+    }
+
+    public Map<TemplateStructureVariableType, String> getVariableValueByType() {
+        return variablesTextFieldsByType.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getText()));
+    }
+
     @Override
     public @Nullable FormError validate() {
 
@@ -117,7 +133,7 @@ public class SliceAddForm implements BaseSliceForm {
             return new FormError(FormErrorType.TEMPLATE_NOT_SELECTED, this.templatesComboBox);
         }
 
-        for (JTextField variableTextField : variablesTextFields) {
+        for (JTextField variableTextField : variablesTextFieldsByType.values()) {
             if (StringUtils.isEmpty(variableTextField.getText())) {
                 return new FormError(FormErrorType.TEXT_FIELD_EMPTY, variableTextField);
             }
@@ -183,7 +199,7 @@ public class SliceAddForm implements BaseSliceForm {
 
     private void fillContentPaneWithVariablesFields(TemplateComboBoxValue item) {
 
-        this.variablesTextFields.clear();
+        this.variablesTextFieldsByType.clear();
 
         Set<TemplateStructureVariableType> usedVariables = item.template().getUsedVariables();
 
@@ -193,7 +209,7 @@ public class SliceAddForm implements BaseSliceForm {
         panel.getInsets().set(0, 10, 0, 10);
 
         int rowIndex = 0;
-        for (TemplateStructureVariableType variableType : usedVariables) {
+        for (TemplateStructureVariableType variableType : usedVariables.stream().sorted(Comparator.comparingInt(TemplateStructureVariableType::getOrder)).toList()) {
 
             if (variableType.isByDefault()) {
                 continue;
@@ -208,7 +224,7 @@ public class SliceAddForm implements BaseSliceForm {
             variableValueTextField.setName(variableType.getValue() + "VariableValueTextField");
             panel.add(variableValueTextField, new GridConstraints(rowIndex, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
 
-            this.variablesTextFields.add(variableValueTextField);
+            this.variablesTextFieldsByType.put(variableType, variableValueTextField);
 
             rowIndex++;
 

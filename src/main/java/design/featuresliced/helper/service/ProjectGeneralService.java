@@ -55,7 +55,7 @@ public final class ProjectGeneralService implements PersistentStateComponent<Pro
     }
 
     public VirtualFile getSourcesRoot() {
-        return VfsUtil.findFile(Path.of(this.settings.getSourcesFolder()), true);
+        return VfsUtil.findFile(Path.of(getState().getSourcesFolder()), true);
     }
 
     /**

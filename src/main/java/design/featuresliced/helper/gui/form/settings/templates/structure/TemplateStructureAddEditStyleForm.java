@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Comparator;
 import java.util.Set;
 
 public class TemplateStructureAddEditStyleForm {
@@ -34,9 +35,9 @@ public class TemplateStructureAddEditStyleForm {
         this.project = project;
         $$$setupUI$$$();
         this.extensionComboBox.setRenderer(SimpleListCellRenderer.create((label, value, index) -> {
-            label.setText(value != null ? value.toString() : null);
+            label.setText(value != null ? value.getLabelWithValue() : null);
         }));
-        extensionTypes.forEach(this.extensionComboBox::addItem);
+        extensionTypes.stream().sorted(Comparator.comparingInt(FileExtensionType::getOrder)).forEach(this.extensionComboBox::addItem);
         this.nameTextField.setText(name);
         if (extensionType != null) {
             this.extensionComboBox.setSelectedItem(extensionType);

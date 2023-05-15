@@ -3,8 +3,7 @@ package design.featuresliced.helper.gui.dialog.settings.confirm;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.util.ui.JBUI;
-import design.featuresliced.helper.model.settings.templates.Template;
-import design.featuresliced.helper.model.settings.templates.structure.TemplateStructureNode;
+import design.featuresliced.helper.model.settings.templates.TemplateStructureNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

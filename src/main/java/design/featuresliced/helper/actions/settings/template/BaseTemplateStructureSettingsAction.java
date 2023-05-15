@@ -3,7 +3,7 @@ package design.featuresliced.helper.actions.settings.template;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.Tree;
 import design.featuresliced.helper.actions.settings.BaseSettingsAction;
-import design.featuresliced.helper.model.settings.templates.structure.TemplateStructureNode;
+import design.featuresliced.helper.model.settings.templates.TemplateStructureNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

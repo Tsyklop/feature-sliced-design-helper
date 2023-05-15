@@ -1,10 +1,14 @@
 package design.featuresliced.helper.gui.form.settings.templates;
 
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionToolbarPosition;
 import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DetailsComponent;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.OnePixelSplitter;
@@ -14,6 +18,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.TextTransferable;
 import design.featuresliced.helper.actions.settings.toolbar.TemplatesToolbarCopyAction;
 import design.featuresliced.helper.actions.settings.toolbar.TemplatesToolbarPasteAction;
 import design.featuresliced.helper.gui.dialog.settings.TemplateAddEditDialog;
@@ -29,11 +34,17 @@ import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class TemplatesSettingsForm {
+public class TemplatesSettingsForm implements Disposable {
+
+    private static final Logger log = Logger.getInstance(TemplatesSettingsForm.class);
 
     private final Project project;
 
     private final DetailsComponent detailsComponent;
+
+    private final java.util.List<Template> newTemplates = new ArrayList<>();
+
+    private final java.util.List<Template> removedTemplates = new ArrayList<>();
 
     private final ProjectTemplatesService projectTemplatesService;
 
@@ -53,7 +64,7 @@ public class TemplatesSettingsForm {
 
     private AnActionButton pasteActionButton;
 
-    private java.util.List<Template> removedTemplates = new ArrayList<>();
+    private TemplateDetailsForm templateDetailsForm;
 
     public TemplatesSettingsForm(Project project) {
         this.project = project;
@@ -98,15 +109,20 @@ public class TemplatesSettingsForm {
         return !this.removedTemplates.isEmpty() || this.templatesListModel.getItems().stream().anyMatch(Template::isNewOrChanged);
     }
 
+    public LayerType getSelectedLayerType() {
+        return (LayerType) this.layersComboBox.getSelectedItem();
+    }
+
     public java.util.List<Template> getNewTemplates() {
-        return this.templatesListModel.getItems()
-                .stream()
-                .filter(Template::isNew)
-                .toList();
+        return this.newTemplates;
     }
 
     public java.util.List<Template> getRemovedTemplates() {
         return this.removedTemplates;
+    }
+
+    public void clearNewTemplates() {
+        this.newTemplates.clear();
     }
 
     public void clearRemovedTemplates() {
@@ -162,14 +178,22 @@ public class TemplatesSettingsForm {
         this.templatesList.getSelectionModel().addListSelectionListener(e -> {
             Template selectedTemplate = this.templatesList.getSelectedValue();
             if (selectedTemplate != null) {
-                this.detailsComponent.setContent(new TemplateDetailsForm(project, selectedTemplate).getRoot());
+                this.copyActionButton.setEnabled(true);
+                this.templateDetailsForm = new TemplateDetailsForm(this.project, selectedTemplate);
+                this.detailsComponent.setContent(this.templateDetailsForm.getRoot());
             } else {
+                if (this.templateDetailsForm != null) {
+                    this.templateDetailsForm.dispose();
+                    this.templateDetailsForm = null;
+                }
+                this.copyActionButton.setEnabled(false);
                 resetRightPanel();
             }
         });
 
         ToolbarDecorator templatesListToolbarDecorator = ToolbarDecorator.createDecorator(templatesList)
                 .initPosition()
+                .setAddActionName("Add template")
                 .setAddAction(anActionButton -> {
 
                     TemplateAddEditDialog dialog = new TemplateAddEditDialog(project, splitter);
@@ -180,11 +204,13 @@ public class TemplatesSettingsForm {
 
                     Template newTemplate = Template.createTemplate(dialog.getName(), (LayerType) this.layersComboBox.getSelectedItem());
 
+                    this.newTemplates.add(newTemplate);
                     this.templatesListModel.add(newTemplate);
 
                     this.templatesList.setSelectedValue(newTemplate, true);
 
                 })
+                .setEditActionName("Edit template")
                 .setEditAction(anActionButton -> {
 
                     Template selectedTemplate = templatesList.getSelectedValue();
@@ -204,6 +230,7 @@ public class TemplatesSettingsForm {
                     //this.templatesListModel.allContentsChanged();
 
                 })
+                .setRemoveActionName("Remove template")
                 .setRemoveAction(anActionButton -> {
 
                     Template template = this.templatesList.getSelectedValue();
@@ -217,16 +244,21 @@ public class TemplatesSettingsForm {
                         this.templatesList.getSelectionModel().clearSelection();
                         this.templatesListModel.remove(template);
                         this.removedTemplates.add(template);
+                        this.newTemplates.remove(template);
                     }
 
                 })
                 .setToolbarPosition(ActionToolbarPosition.TOP);
 
-        this.copyActionButton = new TemplatesToolbarCopyAction();
-        this.pasteActionButton = new TemplatesToolbarPasteAction();
+        this.copyActionButton = new TemplatesToolbarCopyAction(this.templatesList);
+        this.pasteActionButton = new TemplatesToolbarPasteAction(this.templatesList);
 
         this.copyActionButton.setEnabled(false);
         this.pasteActionButton.setEnabled(false);
+
+        CopyPasteManager.getInstance().addContentChangedListener((oldTransferable, newTransferable) -> {
+            this.pasteActionButton.setEnabled(newTransferable instanceof TextTransferable);
+        }, this);
 
         templatesListToolbarDecorator.addExtraActions((AnAction) copyActionButton, (AnAction) pasteActionButton);
 
@@ -251,10 +283,20 @@ public class TemplatesSettingsForm {
         for (Template template : this.projectTemplatesService.getState().getTemplatesBy(selectedLayer)) {
             templatesListModel.add(template);
         }
+        this.newTemplates.stream().filter(template -> template.getLayer() == selectedLayer).forEach(templatesListModel::add);
     }
 
     private void resetRightPanel() {
         this.detailsComponent.setContent(null);
+    }
+
+    @Override
+    public void dispose() {
+        if (this.templateDetailsForm != null) {
+            this.templateDetailsForm.dispose();
+            this.templateDetailsForm = null;
+        }
+        Disposer.dispose(this);
     }
 
 }

@@ -1,6 +1,6 @@
 package design.featuresliced.helper.model.settings.templates;
 
-import design.featuresliced.helper.model.settings.templates.structure.TemplateStructureNode;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import design.featuresliced.helper.model.type.template.TemplateStatusType;
 import design.featuresliced.helper.model.type.fsd.LayerType;
 import design.featuresliced.helper.model.type.template.TemplateStructureVariableType;
@@ -51,7 +51,7 @@ public class Template implements Comparable<Template> {
     }
 
     public static Template createTemplate(@NotNull String name, @Nullable LayerType layer) {
-        return new Template(name, layer, TemplateStatusType.NEW).setUuid();
+        return new Template(name, layer, TemplateStatusType.NEW).generateAndSetUuid();
     }
 
     public String getUuid() {
@@ -87,6 +87,12 @@ public class Template implements Comparable<Template> {
         this.status = status;
     }
 
+    public void changeStatusToNewAndGenerateUuid() {
+        this.status = TemplateStatusType.NEW;
+        setUuid(null);
+        generateAndSetUuid();
+    }
+
     public void changeStatusToSavedIfPossible() {
         /*if (this.status != TemplateStatusType.NEW && this.status != TemplateStatusType.CHANGED) {
             throw new IllegalStateException("Cannot change status to SAVED from " + this.status);
@@ -105,18 +111,22 @@ public class Template implements Comparable<Template> {
         this.status = TemplateStatusType.REMOVED;
     }
 
+    @JsonIgnore
     public boolean isNew() {
         return this.status == TemplateStatusType.NEW;
     }
 
+    @JsonIgnore
     public boolean isChanged() {
         return this.status == TemplateStatusType.CHANGED;
     }
 
+    @JsonIgnore
     public boolean isRemoved() {
         return this.status == TemplateStatusType.REMOVED;
     }
 
+    @JsonIgnore
     public boolean isNewOrChanged() {
         return isNew() || isChanged();
     }
@@ -129,6 +139,7 @@ public class Template implements Comparable<Template> {
         this.rootNode = rootNode;
     }
 
+    @JsonIgnore
     public Set<TemplateStructureVariableType> getUsedVariables() {
         return new HashSet<>(this.rootNode.getAllVariables());
     }
@@ -151,7 +162,7 @@ public class Template implements Comparable<Template> {
         return this.name.compareTo(o.getName());
     }
 
-    private Template setUuid() {
+    private Template generateAndSetUuid() {
         if (this.uuid != null) {
             throw new IllegalStateException();
         }

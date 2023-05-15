@@ -42,7 +42,7 @@ public class TemplateStructureVariableChooserTextField extends ExtendableTextFie
 
                             StringBuilder oldText = new StringBuilder(this.getText());
 
-                            oldText.insert(this.getCaretPosition(), dialog.getSelectedVariableType().valueToVariable());
+                            oldText.insert(this.getCaretPosition(), dialog.getSelectedVariableType().valueToVariableName());
 
                             this.setText(oldText.toString());
 
@@ -69,7 +69,7 @@ public class TemplateStructureVariableChooserTextField extends ExtendableTextFie
                 String value = TemplateStructureVariableChooserTextField.super.getText();
 
                 for (TemplateStructureVariableType variableType : TemplateStructureVariableType.values()) {
-                    if (!value.contains(variableType.valueToVariable())) {
+                    if (!value.contains(variableType.valueToVariableName())) {
                         usedVariables.remove(variableType);
                     }
                 }

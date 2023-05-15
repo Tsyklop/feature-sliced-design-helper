@@ -67,12 +67,6 @@ public class TemplateStructureVariableChooserForm {
         });
 
         this.variablesTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        this.variablesTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                System.out.println(e);
-            }
-        });
 
     }
 

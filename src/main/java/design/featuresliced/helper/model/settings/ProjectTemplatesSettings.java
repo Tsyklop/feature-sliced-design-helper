@@ -4,52 +4,56 @@ import design.featuresliced.helper.model.settings.templates.Template;
 import design.featuresliced.helper.model.type.fsd.LayerType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ProjectTemplatesSettings {
 
-    private Set<Template> templates;
+    private Map<LayerType, Set<Template>> templates;
 
     public ProjectTemplatesSettings() {
-        this.templates = new HashSet<>();
+        this.templates = new HashMap<>();
     }
 
-    public ProjectTemplatesSettings(@NotNull Set<Template> templates) {
-        this.templates = new HashSet<>(templates);
+    public ProjectTemplatesSettings(@NotNull Map<LayerType, Set<Template>> templates) {
+        this.templates = new HashMap<>(templates);
     }
 
-    public Set<Template> getTemplates() {
+    public Map<LayerType, Set<Template>> getTemplates() {
         return templates;
     }
 
-    public void addTemplate(Template template) {
-        this.templates.add(template);
+    public void addTemplate(LayerType layerType, Template template) {
+        this.templates.compute(layerType, (layerType1, templates) -> {
+            if (templates == null) {
+                templates = new HashSet<>();
+            }
+            templates.add(template);
+            return templates;
+        });
     }
 
-    public void removeTemplate(Template toRemove) {
-        this.templates.removeIf(template -> template.getUuid().equals(toRemove.getUuid()));
+    public void removeTemplate(LayerType layerType, Template toRemove) {
+        this.templates.computeIfAbsent(layerType, layerType1 -> new HashSet<>()).removeIf(template -> template.getUuid().equals(toRemove.getUuid()));
     }
 
-    public @NotNull Set<Template> getAllTemplates() {
-        return new HashSet<>(this.templates);
+    public @NotNull Map<LayerType, Set<Template>> getAllTemplates() {
+        return new HashMap<>(this.templates);
     }
 
     public @NotNull Set<Template> getTemplatesBy(@NotNull LayerType layer) {
-        return this.templates.stream()
-                .filter(template -> template.getLayer() == layer)
-                .collect(Collectors.toSet());
+        return this.templates.computeIfAbsent(layer, layerType -> new HashSet<>());
     }
 
     public void markAllTemplatesAsSaved() {
-        for (Template template : this.templates) {
-            template.changeStatusToSavedIfPossible();
-        }
+        this.templates.values().stream().flatMap(Collection::stream).forEach(Template::changeStatusToSavedIfPossible);
     }
 
-    public void setTemplates(Set<Template> templates) {
+    public void setTemplates(Map<LayerType, Set<Template>> templates) {
         this.templates = templates;
     }
 

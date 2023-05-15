@@ -31,7 +31,7 @@ public class TemplateStructureAddEditFileForm {
         this.project = project;
         $$$setupUI$$$();
         this.extensionComboBox.setRenderer(SimpleListCellRenderer.create((label, value, index) -> {
-            label.setText(value != null ? value.toString() : null);
+            label.setText(value != null ? value.getLabelWithValue() : null);
         }));
         extensionTypes.forEach(this.extensionComboBox::addItem);
         this.nameTextField.setText(name);

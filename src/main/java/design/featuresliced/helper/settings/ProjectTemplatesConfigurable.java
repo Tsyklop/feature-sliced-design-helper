@@ -52,17 +52,18 @@ public class ProjectTemplatesConfigurable implements SearchableConfigurable {
         List<Template> newTemplates = this.form.getNewTemplates();
 
         for (Template newTemplate : newTemplates) {
-            this.projectTemplatesService.getState().addTemplate(newTemplate);
+            this.projectTemplatesService.getState().addTemplate(newTemplate.getLayer(), newTemplate);
         }
 
         List<Template> removedTemplates = this.form.getRemovedTemplates();
 
         for (Template removedTemplate : removedTemplates) {
-            this.projectTemplatesService.getState().removeTemplate(removedTemplate);
+            this.projectTemplatesService.getState().removeTemplate(removedTemplate.getLayer(), removedTemplate);
         }
 
         this.projectTemplatesService.getState().markAllTemplatesAsSaved();
 
+        this.form.clearNewTemplates();
         this.form.clearRemovedTemplates();
 
     }
@@ -77,7 +78,7 @@ public class ProjectTemplatesConfigurable implements SearchableConfigurable {
     @Override
     public void disposeUIResources() {
         if (this.form != null) {
-            //this.form.dispose();
+            this.form.dispose();
             this.form = null;
         }
     }

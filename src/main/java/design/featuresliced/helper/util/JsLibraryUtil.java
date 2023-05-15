@@ -1,5 +1,6 @@
 package design.featuresliced.helper.util;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jayway.jsonpath.Configuration;
@@ -9,8 +10,6 @@ import com.jayway.jsonpath.Option;
 import design.featuresliced.helper.model.type.JsLibraryExtensionsType;
 import design.featuresliced.helper.model.type.JsLibraryType;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -18,7 +17,7 @@ import java.util.Optional;
 
 public class JsLibraryUtil {
 
-    private static final Logger log = LoggerFactory.getLogger(JsLibraryUtil.class);
+    private static final Logger log = Logger.getInstance(JsLibraryUtil.class);
 
     private static final Configuration JSPN_PATH_CONFIGURATION = Configuration.builder()
             .options(Option.DEFAULT_PATH_LEAF_TO_NULL)

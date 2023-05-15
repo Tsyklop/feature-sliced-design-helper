@@ -6,19 +6,22 @@ import java.util.stream.Collectors;
 
 public enum FileExtensionType {
 
-    JS("JS", ".js"),
-    TS("TS", ".ts"),
-    JSX("JSX", ".jsx"),
-    TSX("TSX", ".tsx"),
-    VUE("Vue", ".vue"),
+    JS(1, "JS", ".js"),
+    TS(2, "TS", ".ts"),
+    JSX(3, "JSX", ".jsx"),
+    TSX(4, "TSX", ".tsx"),
+    VUE(5, "Vue", ".vue"),
 
-    CSS("CSS", ".css", true),
-    SCSS("Saas", ".scss", true),
-    INLINE("Inline", Set.of(".styles.js", ".styles.ts"), true),
-    CSS_MODULES_CSS("CSS Modules", ".module.css", true),
-    CSS_MODULES_SCSS("CSS Modules", ".module.scss", true),
-    EMOTION("@emotion", Set.of(".jsx", ".tsx"), true),
-    STYLED_COMPONENTS("Styled Components", Set.of(".jsx", ".tsx"), true);
+    CSS(6, "CSS", ".css", true),
+    SCSS(7, "Saas", ".scss", true),
+    INLINE_JS(8, "Inline", ".styles.js", true),
+    INLINE_TS(9, "Inline", ".styles.ts", true),
+    CSS_MODULES_CSS(10, "CSS Modules", ".module.css", true),
+    CSS_MODULES_SCSS(11, "CSS Modules", ".module.scss", true),
+    EMOTION_JSX(12, "@emotion", ".jsx", true),
+    EMOTION_TSX(13, "@emotion", ".tsx", true),
+    STYLED_COMPONENTS_JSX(14, "Styled Components", ".jsx", true),
+    STYLED_COMPONENTS_TSX(15, "Styled Components", ".tsx", true);
 
     //AUTO("Auto", ".<auto>", true);
 
@@ -29,49 +32,43 @@ public enum FileExtensionType {
             .filter(extensionType -> !extensionType.isCanUseForStyles())
             .collect(Collectors.toSet());
 
+    private final int order;
+
     private final String label;
 
-    private final Set<String> values;
+    private final String value;
 
     private final boolean canUseForStyles;
 
-    FileExtensionType(String label, String value) {
-        this(label, Set.of(value), false);
+    FileExtensionType(int order, String label, String value) {
+        this(order, label, value, false);
     }
 
-    FileExtensionType(String label, Set<String> values) {
-        this(label, values, false);
-    }
-
-    FileExtensionType(String label, String value, boolean canUseForStyles) {
-        this(label, Set.of(value), canUseForStyles);
-    }
-
-    FileExtensionType(String label, Set<String> values, boolean canUseForStyles) {
+    FileExtensionType(int order, String label, String value, boolean canUseForStyles) {
+        this.order = order;
         this.label = label;
-        this.values = values;
+        this.value = value;
         this.canUseForStyles = canUseForStyles;
+    }
+
+    public int getOrder() {
+        return order;
     }
 
     public String getLabel() {
         return label;
     }
 
-    public Set<String> getValues() {
-        return values;
+    public String getValue() {
+        return value;
     }
-
-    /*public boolean isAuto() {
-        return this == AUTO;
-    }*/
 
     public boolean isCanUseForStyles() {
         return canUseForStyles;
     }
 
-    @Override
-    public String toString() {
-        return getLabel() + " (" + String.join(",", getValues()) + ")";
+    public String getLabelWithValue() {
+        return getLabel() + " " + getValue();
     }
 
 }

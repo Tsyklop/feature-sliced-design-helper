@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.PlatformIcons;
 import design.featuresliced.helper.gui.dialog.settings.structure.TemplateStructureAddEditFolderDialog;
-import design.featuresliced.helper.model.settings.templates.structure.TemplateStructureNode;
+import design.featuresliced.helper.model.settings.templates.TemplateStructureNode;
 import org.jetbrains.annotations.NotNull;
 
 public class CreateFolderTemplateStructureSettingsAction extends BaseTemplateStructureSettingsAction {
