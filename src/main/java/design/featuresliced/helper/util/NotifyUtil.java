@@ -1,5 +1,6 @@
 package design.featuresliced.helper.util;
 
+import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
@@ -16,6 +17,9 @@ public class NotifyUtil {
 
     private static final String NOTIFICATION_GROUP_ID = "feature-sliced-design-helper-notify-group";
 
+    private static final NotificationGroup NOTIFICATION_GROUP =
+            new NotificationGroup(NOTIFICATION_GROUP_ID, NotificationDisplayType.BALLOON, true);
+
     /**
      * Shows notification.
      *
@@ -26,7 +30,7 @@ public class NotifyUtil {
     public static void show(@Nullable Project project,
                             @Nullable String content,
                             @NotNull NotificationType type) {
-        NotificationGroup notificationGroup = NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID);
+        NotificationGroup notificationGroup = NOTIFICATION_GROUP;
         if (content == null) {
             notificationGroup.createNotification(PluginConstant.TITLE, type).notify(project);
         } else {
@@ -39,7 +43,7 @@ public class NotifyUtil {
                                        @NotNull NotificationType type,
                                        @NotNull List<AnAction> actions) {
 
-        NotificationGroup notificationGroup = NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID);
+        NotificationGroup notificationGroup = NOTIFICATION_GROUP;
 
         notificationGroup.createNotification(PluginConstant.TITLE, content != null ? content : "", type)
                 .addActions((Collection<? extends AnAction>) actions)

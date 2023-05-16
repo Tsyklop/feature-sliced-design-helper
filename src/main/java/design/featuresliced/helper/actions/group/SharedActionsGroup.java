@@ -4,7 +4,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.Separator;
-import com.intellij.openapi.util.NlsActions;
+
 import design.featuresliced.helper.actions.creation.shared.NewApiInSharedAction;
 import design.featuresliced.helper.actions.creation.shared.NewAssetInSharedAction;
 import design.featuresliced.helper.actions.creation.shared.NewConfigInSharedAction;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 @Deprecated
 public class SharedActionsGroup extends DefaultActionGroup {
 
-    public SharedActionsGroup(@Nullable @NlsActions.ActionText String shortName) {
+    public SharedActionsGroup(@Nullable String shortName) {
         super(shortName, true);
     }
 

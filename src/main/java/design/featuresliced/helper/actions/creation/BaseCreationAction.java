@@ -5,7 +5,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.util.NlsActions;
+
 import design.featuresliced.helper.PluginConstant;
 import design.featuresliced.helper.actions.BaseAction;
 import design.featuresliced.helper.gui.dialog.BaseDialogWrapper;
@@ -20,8 +20,8 @@ import javax.swing.*;
 
 public abstract class BaseCreationAction extends BaseAction {
 
-    public BaseCreationAction(@Nullable @NlsActions.ActionText String text,
-                              @Nullable @NlsActions.ActionDescription String description,
+    public BaseCreationAction(@Nullable String text,
+                              @Nullable String description,
                               @Nullable Icon icon) {
         super(text, description, icon);
     }
