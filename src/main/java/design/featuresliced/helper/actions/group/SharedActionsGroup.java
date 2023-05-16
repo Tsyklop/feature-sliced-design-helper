@@ -16,6 +16,7 @@ import icons.FSDIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
 public class SharedActionsGroup extends DefaultActionGroup {
 
     public SharedActionsGroup(@Nullable @NlsActions.ActionText String shortName) {

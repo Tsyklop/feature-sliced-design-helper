@@ -7,8 +7,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.Tree;
 import design.featuresliced.helper.actions.settings.template.CreateFileTemplateStructureSettingsAction;
 import design.featuresliced.helper.actions.settings.template.CreateFolderTemplateStructureSettingsAction;
-import design.featuresliced.helper.actions.settings.template.CreateIndexTemplateStructureSettingsAction;
-import design.featuresliced.helper.actions.settings.template.CreateSegmentTemplateStructureSettingsAction;
 import design.featuresliced.helper.actions.settings.template.CreateStyleTemplateStructureSettingsAction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

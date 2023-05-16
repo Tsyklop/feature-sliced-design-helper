@@ -1,5 +1,7 @@
 package design.featuresliced.helper.gui.form.settings.templates;
 
+import com.intellij.ide.IdeBundle;
+import com.intellij.ide.ReopenProjectAction;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionToolbarPosition;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -9,6 +11,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DetailsComponent;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.wm.impl.welcomeScreen.RecentProjectPanel;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.OnePixelSplitter;
@@ -17,6 +20,7 @@ import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.components.JBList;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.util.PathUtil;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.TextTransferable;
 import design.featuresliced.helper.actions.settings.toolbar.TemplatesToolbarCopyAction;
@@ -27,10 +31,15 @@ import design.featuresliced.helper.model.settings.templates.Template;
 import design.featuresliced.helper.model.type.fsd.LayerType;
 import design.featuresliced.helper.model.type.template.TemplateStatusType;
 import design.featuresliced.helper.service.ProjectTemplatesService;
+import org.jetbrains.annotations.SystemIndependent;
 
 import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -109,10 +118,6 @@ public class TemplatesSettingsForm implements Disposable {
         return !this.removedTemplates.isEmpty() || this.templatesListModel.getItems().stream().anyMatch(Template::isNewOrChanged);
     }
 
-    public LayerType getSelectedLayerType() {
-        return (LayerType) this.layersComboBox.getSelectedItem();
-    }
-
     public java.util.List<Template> getNewTemplates() {
         return this.newTemplates;
     }
@@ -159,7 +164,16 @@ public class TemplatesSettingsForm implements Disposable {
 
         leftPanel.add(new JLabel("Templates:"), new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 
-        this.templatesList = new JBList<>(this.templatesListModel);
+        this.templatesList = new JBList<>(this.templatesListModel) {
+            @Override
+            public String getToolTipText(MouseEvent event) {
+                final int index = event != null ? locationToIndex(event.getPoint()) : -1;
+                if (index != -1) {
+                    setToolTipText(getModel().getElementAt(index).getDescription());
+                }
+                return super.getToolTipText(event);
+            }
+        };
         this.templatesList.setName("templatesList");
 
         this.templatesList.setCellRenderer(SimpleListCellRenderer.create((label, value, index) -> {
@@ -171,6 +185,10 @@ public class TemplatesSettingsForm implements Disposable {
             }
 
             label.setText(name);
+
+            if (value.getDescription() != null) {
+                label.setToolTipText(value.getDescription());
+            }
 
         }));
 
@@ -191,6 +209,29 @@ public class TemplatesSettingsForm implements Disposable {
             }
         });
 
+        this.templatesListModel.addListDataListener(new ListDataListener() {
+            @Override
+            public void intervalAdded(ListDataEvent e) {
+                // You can get inserted items and put it to newTemplates collection
+                Template template = TemplatesSettingsForm.this.templatesListModel.getElementAt(e.getIndex0());
+                if (template.isNew()) {
+                    TemplatesSettingsForm.this.newTemplates.add(template);
+                    TemplatesSettingsForm.this.removedTemplates.remove(template);
+                }
+            }
+
+            @Override
+            public void intervalRemoved(ListDataEvent e) {
+                // You can't get removed elements for remove these elements from newTemplates and add to removedTemplates
+                // Move removed element from newTemplates (if element in this list) to removedTemplates in setRemoveAction of ToolbarDecorator
+            }
+
+            @Override
+            public void contentsChanged(ListDataEvent e) {
+                //System.out.println(e);
+            }
+        });
+
         ToolbarDecorator templatesListToolbarDecorator = ToolbarDecorator.createDecorator(templatesList)
                 .initPosition()
                 .setAddActionName("Add template")
@@ -202,9 +243,8 @@ public class TemplatesSettingsForm implements Disposable {
                         return;
                     }
 
-                    Template newTemplate = Template.createTemplate(dialog.getName(), (LayerType) this.layersComboBox.getSelectedItem());
+                    Template newTemplate = Template.createTemplate(dialog.getName(), dialog.getDescription(), (LayerType) this.layersComboBox.getSelectedItem());
 
-                    this.newTemplates.add(newTemplate);
                     this.templatesListModel.add(newTemplate);
 
                     this.templatesList.setSelectedValue(newTemplate, true);
@@ -219,15 +259,21 @@ public class TemplatesSettingsForm implements Disposable {
                         return;
                     }
 
-                    TemplateAddEditDialog dialog = new TemplateAddEditDialog(selectedTemplate.getName(), project, splitter);
+                    TemplateAddEditDialog dialog = new TemplateAddEditDialog(
+                            selectedTemplate.getName(),
+                            selectedTemplate.getDescription(),
+                            project,
+                            splitter
+                    );
 
                     if (!dialog.showAndGet()) {
                         return;
                     }
 
                     selectedTemplate.setName(dialog.getName());
+                    selectedTemplate.setDescription(dialog.getDescription());
 
-                    //this.templatesListModel.allContentsChanged();
+                    this.templatesListModel.allContentsChanged();
 
                 })
                 .setRemoveActionName("Remove template")

@@ -68,6 +68,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class TemplateDetailsForm implements Disposable {
@@ -712,7 +713,7 @@ public class TemplateDetailsForm implements Disposable {
         @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
 
-            TemplateStructureVariableChooserDialog dialog = new TemplateStructureVariableChooserDialog(e.getProject(), null, java.util.Set.of());
+            TemplateStructureVariableChooserDialog dialog = new TemplateStructureVariableChooserDialog(e.getProject(), null, Set.of());
 
             if (!dialog.showAndGet()) {
                 return;

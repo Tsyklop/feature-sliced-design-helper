@@ -87,7 +87,8 @@ public class NewCreationDialog extends BaseDialogWrapper<SliceAddForm> {
             case FILE, STYLE -> {
                 nodeFile = source.findOrCreateChildData(this, nodeFilledName);
                 if (node.getTemplate() != null && node.getTemplate().getValue() != null) {
-                    nodeFile.setBinaryContent(node.getTemplate().fillValueWithVariablesValues(variableValueByType).getBytes(StandardCharsets.UTF_8));
+                    String content = new String(nodeFile.contentsToByteArray()) + "\n\n" + node.getTemplate().fillValueWithVariablesValues(variableValueByType);
+                    nodeFile.setBinaryContent(content.getBytes(StandardCharsets.UTF_8));
                 }
             }
             case ROOT, FOLDER -> {

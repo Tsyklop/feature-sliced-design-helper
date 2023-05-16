@@ -89,7 +89,7 @@ public final class ProjectTemplatesService implements PersistentStateComponent<P
             for (Map.Entry<LayerType, Set<Template>> entry : templates.entrySet()) {
                 for (Template template: entry.getValue()) {
                     template.changeStatusToNewAndGenerateUuid();
-                    template.changeStatusToSavedIfPossible();
+                    //template.changeStatusToSavedIfPossible();
                 }
             }
 

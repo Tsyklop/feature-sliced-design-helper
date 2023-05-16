@@ -1,16 +1,14 @@
-package design.featuresliced.helper.gui.form.settings.templates.structure;
+package design.featuresliced.helper.gui.form.settings.templates.modify.structure;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import design.featuresliced.helper.gui.component.TemplateStructureVariableChooserTextField;
-import design.featuresliced.helper.model.type.template.TemplateStructureVariableType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Set;
 
 public class TemplateStructureAddEditFolderForm {
 

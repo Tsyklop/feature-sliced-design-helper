@@ -40,7 +40,12 @@ public class TemplatesToolbarPasteAction extends BaseToolbarSettingsAction {
 
             Template newTemplate = this.objectMapper.readValue((String) CopyPasteManager.getInstance().getContents(DataFlavor.stringFlavor), Template.class);
 
-            TemplateAddEditDialog dialog = new TemplateAddEditDialog(newTemplate.getName() + "(Copy)", e.getProject(), this.templatesList);
+            TemplateAddEditDialog dialog = new TemplateAddEditDialog(
+                    newTemplate.getName() + "(Copy)",
+                    newTemplate.getDescription(),
+                    e.getProject(),
+                    this.templatesList
+            );
 
             if (!dialog.showAndGet()) {
                 return;

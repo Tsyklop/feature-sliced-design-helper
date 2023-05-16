@@ -1,4 +1,4 @@
-package design.featuresliced.helper.gui.form.settings.templates.structure;
+package design.featuresliced.helper.gui.form.settings.templates.modify.structure;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleListCellRenderer;
@@ -17,8 +17,10 @@ public class TemplateStructureAddEditFileForm {
 
     private final Project project;
     private JPanel root;
-    private TemplateStructureVariableChooserTextField nameTextField;
+
     private JComboBox<FileExtensionType> extensionComboBox;
+
+    private TemplateStructureVariableChooserTextField nameTextField;
 
     public TemplateStructureAddEditFileForm(@NotNull Project project, @NotNull Set<FileExtensionType> extensionTypes) {
         this(project, null, null, extensionTypes);

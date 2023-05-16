@@ -3,7 +3,7 @@ package design.featuresliced.helper.gui.dialog.settings.structure;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
-import design.featuresliced.helper.gui.form.settings.templates.structure.TemplateStructureAddEditFileForm;
+import design.featuresliced.helper.gui.form.settings.templates.modify.structure.TemplateStructureAddEditFileForm;
 import design.featuresliced.helper.model.type.FileExtensionType;
 import design.featuresliced.helper.model.type.template.TemplateStructureVariableType;
 import org.apache.commons.lang3.StringUtils;

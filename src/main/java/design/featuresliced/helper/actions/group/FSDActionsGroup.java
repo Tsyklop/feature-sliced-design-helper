@@ -8,9 +8,12 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import design.featuresliced.helper.actions.creation.slice.NewAppCreationAction;
 import design.featuresliced.helper.actions.creation.slice.NewEntityCreationAction;
 import design.featuresliced.helper.actions.creation.slice.NewFeatureCreationAction;
 import design.featuresliced.helper.actions.creation.slice.NewPageCreationAction;
+import design.featuresliced.helper.actions.creation.slice.NewProcessCreationAction;
+import design.featuresliced.helper.actions.creation.slice.NewSharedCreationAction;
 import design.featuresliced.helper.actions.creation.slice.NewWidgetCreationAction;
 import design.featuresliced.helper.model.type.fsd.LayerType;
 import design.featuresliced.helper.service.ProjectGeneralService;
@@ -82,11 +85,13 @@ public class FSDActionsGroup extends ActionGroup {
         Optional<LayerType> fsdLayerType = LayerType.valueOfOptional(selectedFile.getName().toUpperCase());
 
         return fsdLayerType.map(type -> switch (type) {
+            case APP -> new AnAction[]{buildCreateAppAction()};
             case PAGES -> new AnAction[]{buildCreatePageAction()};
             case SHARED -> new AnAction[]{buildCreateSharedAction()};
             case WIDGETS -> new AnAction[]{buildCreateWidgetAction()};
             case FEATURES -> new AnAction[]{buildCreateFeatureAction()};
             case ENTITIES -> new AnAction[]{buildCreateEntityAction()};
+            case PROCESSES -> new AnAction[]{buildCreateProcessAction()};
             default -> EMPTY_ACTIONS;
         }).orElse(EMPTY_ACTIONS);
 
@@ -98,13 +103,20 @@ public class FSDActionsGroup extends ActionGroup {
 
     private @NotNull AnAction[] buildAllActionsArray() {
         return new AnAction[]{
+                buildCreateAppAction(),
                 buildCreatePageAction(),
                 buildCreateEntityAction(),
                 buildCreateWidgetAction(),
                 buildCreateFeatureAction(),
-                Separator.getInstance(),
+                buildCreateProcessAction(),
                 buildCreateSharedAction(),
+                /*Separator.getInstance(),
+                buildCreateSharedAction(),*/
         };
+    }
+
+    private @NotNull AnAction buildCreateAppAction() {
+        return new NewAppCreationAction();
     }
 
     private @NotNull AnAction buildCreatePageAction() {
@@ -123,7 +135,16 @@ public class FSDActionsGroup extends ActionGroup {
         return new NewFeatureCreationAction();
     }
 
+    private @NotNull AnAction buildCreateProcessAction() {
+        return new NewProcessCreationAction();
+    }
+
     private @NotNull AnAction buildCreateSharedAction() {
+        return new NewSharedCreationAction();
+    }
+
+    @Deprecated
+    private @NotNull AnAction buildCreateSharedActionOld() {
         return new SharedActionsGroup("Shared");
     }
 

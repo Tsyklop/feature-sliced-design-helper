@@ -1,4 +1,4 @@
-package design.featuresliced.helper.gui.form.settings.templates.structure;
+package design.featuresliced.helper.gui.form.settings.templates.modify.structure;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleListCellRenderer;

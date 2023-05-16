@@ -46,7 +46,7 @@
                              displayName="Templates"
                              nonDefaultProject="true"/>
 
-        <!--        <applicationService serviceImplementation="krasa.mavenhelper.MavenHelperApplicationService"/>-->
+        <!--        <treeStructureProvider implementation="design.featuresliced.helper.ProjectTreeStructureWithSortingProvider"/>-->
 
     </extensions>
 
