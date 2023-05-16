@@ -27,6 +27,7 @@ public final class ProjectGeneralService implements PersistentStateComponent<Pro
     public ProjectGeneralService(Project project) {
         this.project = project;
         this.projectRoot = ProjectUtil.guessProjectDir(project);
+
     }
 
     public static ProjectGeneralService getInstance(Project project) {

@@ -73,6 +73,9 @@ public final class ProjectTemplatesService implements PersistentStateComponent<P
 
             if (sourcesRoot == null || !sourcesRoot.exists()) {
                 sourcesRoot = projectGeneralService.getProjectRoot();
+                if (sourcesRoot == null) {
+                    return new ProjectTemplatesSettings();
+                }
             }
 
             JsLibraryType jsLibrary = JsLibraryUtil.resolveType(sourcesRoot);

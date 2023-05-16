@@ -1,4 +1,4 @@
-package design.featuresliced.helper.actions.creation.slice;
+package design.featuresliced.helper.actions.creation;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.project.Project;

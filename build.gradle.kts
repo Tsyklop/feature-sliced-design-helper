@@ -71,6 +71,10 @@ tasks {
         kotlinOptions.jvmTarget = "17"
     }
 
+    buildPlugin {
+
+    }
+
     patchPluginXml {
 
         untilBuild.set("")

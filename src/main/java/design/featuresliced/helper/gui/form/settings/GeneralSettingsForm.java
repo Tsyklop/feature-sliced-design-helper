@@ -5,6 +5,7 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
@@ -32,67 +33,19 @@ public class GeneralSettingsForm implements BaseSettingsForm, Disposable {
     private JTextField featuresLayerTextField;
     private JTextField processesLayerTextField;
 
-    public GeneralSettingsForm(Project project) {
+    public GeneralSettingsForm(@NotNull Project project) {
         this.project = project;
+
+        VirtualFile projectRoot = ProjectUtil.guessProjectDir(project);
+
+        OpenProjectFileChooserDescriptor descriptor = new OpenProjectFileChooserDescriptor(false, false);
 
         this.sourceRootTextField.addBrowseFolderListener(
                 "Choose custom sources folder",
                 "",
                 project,
-                new OpenProjectFileChooserDescriptor(false, false).withRoots(ProjectUtil.guessProjectDir(project))
+                projectRoot != null ? descriptor.withRoots(projectRoot) : descriptor
         );
-
-        /*new ComponentValidator(this).withValidator(() -> {
-            String appLayerName = this.appLayerTextField.getText();
-            if (StringUtils.isEmpty(appLayerName)) {
-                return new ValidationInfo("Enter app layer name", this.appLayerTextField);
-            }
-            return null;
-        }).andStartOnFocusLost().installOn(this.appLayerTextField);
-
-        new ComponentValidator(this).withValidator(() -> {
-            String pagesLayerName = this.pagesLayerTextField.getText();
-            if (StringUtils.isEmpty(pagesLayerName)) {
-                return new ValidationInfo("Enter pages layer name", this.pagesLayerTextField);
-            }
-            return null;
-        }).andStartOnFocusLost().installOn(this.pagesLayerTextField);
-
-        new ComponentValidator(this).withValidator(() -> {
-            String sharedLayerName = this.sharedLayerTextField.getText();
-            if (StringUtils.isEmpty(sharedLayerName)) {
-                return new ValidationInfo("Enter shared layer name", this.sharedLayerTextField);
-            }
-            return null;
-        }).andStartOnFocusLost().installOn(this.sharedLayerTextField);
-
-        new ComponentValidator(this).withValidator(() -> {
-            String widgetsLayerName = this.widgetsLayerTextField.getText();
-            if (StringUtils.isEmpty(widgetsLayerName)) {
-                return new ValidationInfo("Enter widgets layer name", this.widgetsLayerTextField);
-            }
-            return null;
-        }).andStartOnFocusLost().installOn(this.widgetsLayerTextField);*/
-
-        /*ComponentValidator componentValidator = new ComponentValidator(this).withValidator(() -> {
-            String appLayerName = this.appLayerTextField.getText();
-            if (StringUtils.isEmpty(appLayerName)) {
-                return new ValidationInfo("Enter app layer name", this.appLayerTextField);
-            }
-            String pagesLayerName = this.pagesLayerTextField.getText();
-            if (StringUtils.isEmpty(pagesLayerName)) {
-                return new ValidationInfo("Enter pages layer name", this.pagesLayerTextField);
-            }
-            String sharedLayerName = this.sharedLayerTextField.getText();
-            if (StringUtils.isEmpty(sharedLayerName)) {
-                return new ValidationInfo("Enter shared layer name", this.sharedLayerTextField);
-            }
-            String widgetsLayerName = this.widgetsLayerTextField.getText();
-            if (StringUtils.isEmpty(widgetsLayerName)) {
-                return new ValidationInfo("Enter widgets layer name", this.widgetsLayerTextField);
-            }
-            return null;
-        }).installOn(this.root);*/
 
     }
 

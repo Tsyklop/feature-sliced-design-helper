@@ -1,4 +1,4 @@
-package design.featuresliced.helper.actions.creation.slice;
+package design.featuresliced.helper.actions.creation;
 
 import design.featuresliced.helper.model.type.fsd.LayerType;
 import icons.FSDIcons;

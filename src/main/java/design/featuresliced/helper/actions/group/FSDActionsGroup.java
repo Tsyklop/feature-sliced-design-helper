@@ -1,20 +1,18 @@
 package design.featuresliced.helper.actions.group;
 
 import com.intellij.openapi.actionSystem.ActionGroup;
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import design.featuresliced.helper.actions.creation.slice.NewAppCreationAction;
-import design.featuresliced.helper.actions.creation.slice.NewEntityCreationAction;
-import design.featuresliced.helper.actions.creation.slice.NewFeatureCreationAction;
-import design.featuresliced.helper.actions.creation.slice.NewPageCreationAction;
-import design.featuresliced.helper.actions.creation.slice.NewProcessCreationAction;
-import design.featuresliced.helper.actions.creation.slice.NewSharedCreationAction;
-import design.featuresliced.helper.actions.creation.slice.NewWidgetCreationAction;
+import design.featuresliced.helper.actions.creation.NewAppCreationAction;
+import design.featuresliced.helper.actions.creation.NewEntityCreationAction;
+import design.featuresliced.helper.actions.creation.NewFeatureCreationAction;
+import design.featuresliced.helper.actions.creation.NewPageCreationAction;
+import design.featuresliced.helper.actions.creation.NewProcessCreationAction;
+import design.featuresliced.helper.actions.creation.NewSharedCreationAction;
+import design.featuresliced.helper.actions.creation.NewWidgetCreationAction;
 import design.featuresliced.helper.model.type.fsd.LayerType;
 import design.featuresliced.helper.service.ProjectGeneralService;
 import org.jetbrains.annotations.NotNull;
@@ -136,11 +134,6 @@ public class FSDActionsGroup extends ActionGroup {
 
     private @NotNull AnAction buildCreateSharedAction() {
         return new NewSharedCreationAction();
-    }
-
-    @Deprecated
-    private @NotNull AnAction buildCreateSharedActionOld() {
-        return new SharedActionsGroup("Shared");
     }
 
 }
