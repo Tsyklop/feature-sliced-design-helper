@@ -6,7 +6,7 @@ Introduction
 
 <!-- Plugin description -->
 
-[**Feature Sliced Design**](https://feature-sliced.design/) - architectural methodology for frontend projects.
+[**Feature-Sliced Design**](https://feature-sliced.design/) - architectural methodology for frontend projects.
 
 This plugin will help you with this methodology. Namely, with the flexible creation of slices in layers and segments in slices. 
 
@@ -58,7 +58,7 @@ Usage
 
 ![Example](./.github/README/general-settings.png)
 
-#### Change templates: Create
+#### Templates: Create
 
 1. Open Settings (Not project Structure) and find Feature-Sliced Design section and expand it.   
 2. Choose layer what you need.  
@@ -69,16 +69,28 @@ Usage
 7. For created files and styles you can write file template with variables.
 8. Click "Apply" button.
 
-#### Change templates: Edit
+#### Templates: Edit
 
 1. Open Settings (Not project Structure) and find Feature-Sliced Design section and expand it.   
 2. Choose layer what you need.  
 3. Select template by clicking on it in list.
 4. Change the name or/and description of template (name is required) and click "OK" button.
 5. Change structure for template. You can crate or edit files, styles or folders by clicking on pencil button in toolbar.
-8. Click "Apply" button. 
+6. Click "Apply" button. 
 
 ![Example](./.github/README/templates.png)
+
+#### Templates: Use
+
+1. Right-Click on the project root or source root (specified in settings or default).
+2. Hover on "New" item, then hover on Feature-Sliced Design item.
+3. Click on item what you need.
+4. Select template.
+5. Fill all variables values.
+6. Click "OK" button. 
+
+![Select](./.github/README/template-usage-1.png)
+![Create](./.github/README/template-usage-2.png)
 
 [plugin-website]:      https://plugins.jetbrains.com/plugin/21638-feature-slices-design-helper
 [latest-release]:      https://github.com/Tsyklop/feature-slices-design-helper/releases/latest
