@@ -92,5 +92,5 @@ Usage
 ![Select](./.github/README/template-usage-1.png)
 ![Create](./.github/README/template-usage-2.png)
 
-[plugin-website]:      https://plugins.jetbrains.com/plugin/21638-feature-slices-design-helper
-[latest-release]:      https://github.com/Tsyklop/feature-slices-design-helper/releases/latest
+[plugin-website]:      https://plugins.jetbrains.com/plugin/21638-feature-sliced-design-helper
+[latest-release]:      https://github.com/Tsyklop/feature-sliced-design-helper/releases/latest
