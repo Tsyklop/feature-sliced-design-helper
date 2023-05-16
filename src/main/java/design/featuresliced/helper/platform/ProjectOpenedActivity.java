@@ -1,4 +1,4 @@
-package design.featuresliced.helper;
+package design.featuresliced.helper.platform;
 
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.project.Project;

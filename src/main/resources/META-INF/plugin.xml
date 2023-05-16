@@ -28,7 +28,7 @@
                            toolWindowId="Project"
         />
 
-        <postStartupActivity implementation="design.featuresliced.helper.ProjectOpenedActivity"/>
+        <postStartupActivity implementation="design.featuresliced.helper.platform.ProjectOpenedActivity"/>
         
         <projectService serviceImplementation="design.featuresliced.helper.service.ProjectGeneralService"/>
         <projectService serviceImplementation="design.featuresliced.helper.service.ProjectTemplatesService"/>

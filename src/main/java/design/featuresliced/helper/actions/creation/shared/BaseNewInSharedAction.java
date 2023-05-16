@@ -1,6 +1,5 @@
 package design.featuresliced.helper.actions.creation.shared;
 
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.project.Project;
 import design.featuresliced.helper.actions.creation.BaseCreationAction;
 import design.featuresliced.helper.gui.dialog.creation.shared.BaseSharedDialog;
@@ -14,11 +13,6 @@ public abstract class BaseNewInSharedAction extends BaseCreationAction {
 
     public BaseNewInSharedAction(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
         super(text, description, icon);
-    }
-
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return super.getActionUpdateThread();
     }
 
     protected abstract @NotNull BaseSharedDialog<?> createDialog(@NotNull Project project, JsLibraryType jsLibrary);

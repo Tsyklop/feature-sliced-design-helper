@@ -46,7 +46,31 @@ public class SliceAddForm implements BaseSliceForm {
 
     private ComboBox<TemplateComboBoxValue> templatesComboBox;
 
-    private record TemplateComboBoxValue(String label, Template template) {
+    private static class TemplateComboBoxValue {
+
+        private String label;
+        private Template template;
+
+        public TemplateComboBoxValue(String label, Template template) {
+            this.label = label;
+            this.template = template;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public void setLabel(String label) {
+            this.label = label;
+        }
+
+        public Template getTemplate() {
+            return template;
+        }
+
+        public void setTemplate(Template template) {
+            this.template = template;
+        }
 
     }
 
@@ -62,7 +86,7 @@ public class SliceAddForm implements BaseSliceForm {
 
         this.templatesComboBox.setEditable(false);
         this.templatesComboBox.setRenderer(SimpleListCellRenderer.create((label, value, index) -> {
-            label.setText(value != null ? value.label() : null);
+            label.setText(value != null ? value.getLabel() : null);
         }));
 
         DefaultComboBoxModel<TemplateComboBoxValue> templatesComboBoxModel = new DefaultComboBoxModel<>();
@@ -115,7 +139,7 @@ public class SliceAddForm implements BaseSliceForm {
     public Optional<Template> getSelectedTemplate() {
         return Optional.ofNullable(templatesComboBox.getSelectedItem())
                 .map(o -> (TemplateComboBoxValue) o)
-                .map(TemplateComboBoxValue::template);
+                .map(TemplateComboBoxValue::getTemplate);
     }
 
     public Map<TemplateStructureVariableType, String> getVariableValueByType() {
@@ -129,7 +153,7 @@ public class SliceAddForm implements BaseSliceForm {
 
         TemplateComboBoxValue value = (TemplateComboBoxValue) this.templatesComboBox.getSelectedItem();
 
-        if (value == null || value.template() == null) {
+        if (value == null || value.getTemplate() == null) {
             return new FormError(FormErrorType.TEMPLATE_NOT_SELECTED, this.templatesComboBox);
         }
 
@@ -201,7 +225,7 @@ public class SliceAddForm implements BaseSliceForm {
 
         this.variablesTextFieldsByType.clear();
 
-        Set<TemplateStructureVariableType> usedVariables = item.template().getUsedVariables();
+        Set<TemplateStructureVariableType> usedVariables = item.getTemplate().getUsedVariables();
 
         JPanel panel = new JPanel(new GridLayoutManager(usedVariables.size() + 1, 2, JBUI.emptyInsets(), -1, -1));
 

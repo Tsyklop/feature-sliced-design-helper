@@ -306,7 +306,7 @@ public class TemplatesSettingsForm implements Disposable {
             this.pasteActionButton.setEnabled(newTransferable instanceof TextTransferable);
         }, this);
 
-        templatesListToolbarDecorator.addExtraActions((AnAction) copyActionButton, (AnAction) pasteActionButton);
+        templatesListToolbarDecorator.addExtraActions(copyActionButton, pasteActionButton);
 
         this.templatesListPanel = templatesListToolbarDecorator.createPanel();
         this.templatesListPanel.setName("templatesListPanel");

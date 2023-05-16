@@ -27,11 +27,6 @@ public class FSDActionsGroup extends ActionGroup {
     private static final AnAction[] EMPTY_ACTIONS = new AnAction[0];
 
     @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return super.getActionUpdateThread();
-    }
-
-    @Override
     public void update(@NotNull AnActionEvent e) {
 
         Project project = e.getProject();
