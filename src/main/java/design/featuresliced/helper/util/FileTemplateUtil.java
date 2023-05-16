@@ -1,6 +1,6 @@
 package design.featuresliced.helper.util;
 
-import design.featuresliced.helper.model.JsLibraryExtensionsType;
+import design.featuresliced.helper.model.type.JsLibraryExtensionsType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;

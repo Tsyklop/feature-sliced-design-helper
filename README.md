@@ -6,36 +6,35 @@ Introduction
 
 <!-- Plugin description -->
 
-[**Feature Sliced Design**](https://feature-sliced.design/) - architectural methodology for frontend projects.
+[**Feature-Sliced Design**](https://feature-sliced.design/) - architectural methodology for frontend projects.
 
 This plugin will help you with this methodology. Namely, with the flexible creation of slices in layers and segments in slices. 
 
-For layers: entities, pages, widgets and features you can create ui + styles (only as file), lib, api, model segments as file or folder.
+You can use the default templates or create your own to meet all your project needs.
 
-For shared layer you can create next slices: ui, api, assets, config, lib, type (TS).
-
-Supported frontend libraries: [Vue](https://vuejs.org/), [React](https://react.dev/).
-
-Project with monorepo do not supported for now.
+Supported:
+- Any project structure
+- Frontend libraries: [Vue](https://vuejs.org/), [React](https://react.dev/).
 
 Features
 --------
 
-- Create Entities
-- Create Features
+- Any project structure
 - Create Pages
 - Create Widgets
+- Create Entities
+- Create Features
+- Create App elements
 - Create Shared elements
-- Support Storybook
-- Support styles: Pure CSS, Saas, Inline, CSS Modules, Styled Components
+- Support styles: Pure CSS, Saas, Inline, CSS Modules, @emotion, Styled Components
 
 <!-- Plugin description end -->
 
 Supported IDEs
 --------------
 
-**WebStorm** is supported since version 2021.1.    
-**Intellij Ultimate** is supported since version 2021.1.    
+**WebStorm** is supported since version 2023.1.    
+**Intellij Ultimate** is supported since version 2023.1.    
 
 Installation
 ------------
@@ -50,7 +49,48 @@ Restart IDE.
 Usage
 -----
 
-TODO 
+#### Change sources root or layers names
 
-[plugin-website]:      https://plugins.jetbrains.com/plugin/21638-feature-slices-design-helper
-[latest-release]:      https://github.com/Tsyklop/feature-slices-design-helper/releases/latest
+1. Open Settings (Not project Structure) and find Feature-Sliced Design section.   
+2. Change source root in Source Root field.   
+3. Set own layers names in specified text fields.   
+4. Click "Apply" button and close settings.  
+
+![Example](./.github/README/general-settings.png)
+
+#### Templates: Create
+
+1. Open Settings (Not project Structure) and find Feature-Sliced Design section and expand it.   
+2. Choose layer what you need.  
+3. Create new one by clicking on plus button in toolbar.
+4. Enter the name and description of template (name is required) and click "OK" button. This templates will be selected.
+5. Create structure for created template: crate file, style or folder by clicking on plus button in toolbar.
+6. Enter name (You can insert variables) and select extension (for file and style) and press "OK" button.
+7. For created files and styles you can write file template with variables.
+8. Click "Apply" button.
+
+#### Templates: Edit
+
+1. Open Settings (Not project Structure) and find Feature-Sliced Design section and expand it.   
+2. Choose layer what you need.  
+3. Select template by clicking on it in list.
+4. Change the name or/and description of template (name is required) and click "OK" button.
+5. Change structure for template. You can crate or edit files, styles or folders by clicking on pencil button in toolbar.
+6. Click "Apply" button. 
+
+![Example](./.github/README/templates.png)
+
+#### Templates: Use
+
+1. Right-Click on the project root or source root (specified in settings or default).
+2. Hover on "New" item, then hover on Feature-Sliced Design item.
+3. Click on item what you need.
+4. Select template.
+5. Fill all variables values.
+6. Click "OK" button. 
+
+![Select](./.github/README/template-usage-1.png)
+![Create](./.github/README/template-usage-2.png)
+
+[plugin-website]:      https://plugins.jetbrains.com/plugin/21638-feature-sliced-design-helper
+[latest-release]:      https://github.com/Tsyklop/feature-sliced-design-helper/releases/latest

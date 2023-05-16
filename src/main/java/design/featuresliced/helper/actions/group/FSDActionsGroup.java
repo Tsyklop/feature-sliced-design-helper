@@ -4,15 +4,17 @@ import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import design.featuresliced.helper.actions.slice.NewEntityAction;
-import design.featuresliced.helper.actions.slice.NewFeatureAction;
-import design.featuresliced.helper.actions.slice.NewPageAction;
-import design.featuresliced.helper.actions.slice.NewWidgetAction;
-import design.featuresliced.helper.model.FsdLayerType;
-import icons.FSDIcons;
+import design.featuresliced.helper.actions.creation.NewAppCreationAction;
+import design.featuresliced.helper.actions.creation.NewEntityCreationAction;
+import design.featuresliced.helper.actions.creation.NewFeatureCreationAction;
+import design.featuresliced.helper.actions.creation.NewPageCreationAction;
+import design.featuresliced.helper.actions.creation.NewProcessCreationAction;
+import design.featuresliced.helper.actions.creation.NewSharedCreationAction;
+import design.featuresliced.helper.actions.creation.NewWidgetCreationAction;
+import design.featuresliced.helper.model.type.fsd.LayerType;
+import design.featuresliced.helper.service.ProjectGeneralService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,7 +36,17 @@ public class FSDActionsGroup extends ActionGroup {
             return;
         }
 
-        e.getPresentation().setVisible(isSrcFolderOrProjectRoot(project, selectedFile) || FsdLayerType.valueOfOptional(selectedFile.getName().toUpperCase()).isPresent());
+        VirtualFile sourcesRoot = ProjectGeneralService.getInstance(project).getSourcesRoot();
+
+        e.getPresentation().setEnabled(sourcesRoot != null);
+        e.getPresentation().setDescription(sourcesRoot != null ? "Specify sources root in settings" : "Creates fsd things");
+
+        if (sourcesRoot != null) {
+            e.getPresentation().setVisible(
+                    isSourcesRootOrProjectRoot(project, sourcesRoot, selectedFile)
+                            || LayerType.valueOfOptional(selectedFile.getName().toUpperCase()).isPresent()
+            );
+        }
 
     }
 
@@ -53,66 +65,75 @@ public class FSDActionsGroup extends ActionGroup {
             return EMPTY_ACTIONS;
         }
 
-        if (isSrcFolderOrProjectRoot(project, selectedFile)) {
-            return buildAllActionsArray();
-        }
+        VirtualFile sourcesRoot = ProjectGeneralService.getInstance(project).getSourcesRoot();
 
-        Optional<FsdLayerType> fsdLayerType = FsdLayerType.valueOfOptional(selectedFile.getName().toUpperCase());
-
-        if (fsdLayerType.isEmpty()) {
+        if (sourcesRoot == null) {
             return EMPTY_ACTIONS;
         }
 
-        switch (fsdLayerType.get()) {
-            case PAGES:
-                return new AnAction[]{buildCreatePageAction()};
-            case SHARED:
-                return new AnAction[]{buildCreateSharedAction()};
-            case WIDGETS:
-                return new AnAction[]{buildCreateWidgetAction()};
-            case FEATURES:
-                return new AnAction[]{buildCreateFeatureAction()};
-            case ENTITIES:
-                return new AnAction[]{buildCreateEntityAction()};
+        if (isSourcesRootOrProjectRoot(project, sourcesRoot, selectedFile)) {
+            return buildAllActionsArray();
         }
 
-        return EMPTY_ACTIONS;
+        Optional<LayerType> fsdLayerType = LayerType.valueOfOptional(selectedFile.getName().toUpperCase());
+
+        return fsdLayerType.map(type -> switch (type) {
+            case APP -> new AnAction[]{buildCreateAppAction()};
+            case PAGES -> new AnAction[]{buildCreatePageAction()};
+            case SHARED -> new AnAction[]{buildCreateSharedAction()};
+            case WIDGETS -> new AnAction[]{buildCreateWidgetAction()};
+            case FEATURES -> new AnAction[]{buildCreateFeatureAction()};
+            case ENTITIES -> new AnAction[]{buildCreateEntityAction()};
+            case PROCESSES -> new AnAction[]{buildCreateProcessAction()};
+            default -> EMPTY_ACTIONS;
+        }).orElse(EMPTY_ACTIONS);
 
     }
 
-    private boolean isSrcFolderOrProjectRoot(Project project, VirtualFile selectedFile) {
-        return (project.getBasePath() != null && project.getBasePath().equals(selectedFile.getPath())) || selectedFile.getPath().endsWith("src");
+    private boolean isSourcesRootOrProjectRoot(Project project, VirtualFile sourcesRoot, VirtualFile selectedFile) {
+        return (project.getBasePath() != null && project.getBasePath().equals(selectedFile.getPath())) || sourcesRoot.getPath().equals(selectedFile.getPath());
     }
 
     private @NotNull AnAction[] buildAllActionsArray() {
         return new AnAction[]{
+                buildCreateAppAction(),
                 buildCreatePageAction(),
                 buildCreateEntityAction(),
                 buildCreateWidgetAction(),
                 buildCreateFeatureAction(),
-                Separator.getInstance(),
+                buildCreateProcessAction(),
                 buildCreateSharedAction(),
+                /*Separator.getInstance(),
+                buildCreateSharedAction(),*/
         };
     }
 
+    private @NotNull AnAction buildCreateAppAction() {
+        return new NewAppCreationAction();
+    }
+
     private @NotNull AnAction buildCreatePageAction() {
-        return new NewPageAction("Create Page", "Create new page", FSDIcons.MAIN_ICON);
+        return new NewPageCreationAction();
     }
 
     private @NotNull AnAction buildCreateEntityAction() {
-        return new NewEntityAction("Create Entity", "Create new entity", FSDIcons.MAIN_ICON);
+        return new NewEntityCreationAction();
     }
 
     private @NotNull AnAction buildCreateWidgetAction() {
-        return new NewWidgetAction("Create Widget", "Create new widget", FSDIcons.MAIN_ICON);
+        return new NewWidgetCreationAction();
     }
 
     private @NotNull AnAction buildCreateFeatureAction() {
-        return new NewFeatureAction("Create Feature", "Create new feature", FSDIcons.MAIN_ICON);
+        return new NewFeatureCreationAction();
+    }
+
+    private @NotNull AnAction buildCreateProcessAction() {
+        return new NewProcessCreationAction();
     }
 
     private @NotNull AnAction buildCreateSharedAction() {
-        return new SharedActionsGroup("Shared");
+        return new NewSharedCreationAction();
     }
 
 }

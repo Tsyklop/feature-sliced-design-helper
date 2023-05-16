@@ -1,0 +1,372 @@
+{
+  "APP": [
+    {
+      "name": "Provider",
+      "layer": "APP",
+      "description": "Simple Provider",
+      "rootNode": {
+        "name": "$$layerName$$",
+        "extensionType": null,
+        "nodes": [
+          {
+            "name": "$$sliceOrSegmentName$$",
+            "extensionType": "JSX",
+            "nodes": [],
+            "nodeType": "FILE",
+            "template": {
+              "value": "import React from \"react\";\n\nconst $$componentName$$ = (component: Component) => () => (\n    // TODO\n);\n\nexport default $$componentName$$;\n",
+              "variables": [
+                "COMPONENT_NAME"
+              ]
+            },
+            "variables": [
+              "SLICE_OR_SEGMENT_NAME"
+            ]
+          }
+        ],
+        "nodeType": "ROOT",
+        "template": null,
+        "variables": [
+          "LAYER_NAME"
+        ]
+      }
+    },
+    {
+      "name": "Style Sass",
+      "layer": "APP",
+      "description": "Simple style file with append import to index",
+      "rootNode": {
+        "name": "$$layerName$$",
+        "extensionType": null,
+        "nodes": [
+          {
+            "name": "$$sliceOrSegmentName$$",
+            "extensionType": "SCSS",
+            "nodes": [],
+            "nodeType": "STYLE",
+            "template": null,
+            "variables": [
+              "SLICE_OR_SEGMENT_NAME"
+            ]
+          },
+          {
+            "name": "index",
+            "extensionType": "SCSS",
+            "nodes": [],
+            "nodeType": "STYLE",
+            "template": {
+              "value": "@import \"./$$sliceOrSegmentName$$.scss\";",
+              "variables": [
+                "SLICE_OR_SEGMENT_NAME"
+              ]
+            },
+            "variables": []
+          }
+        ],
+        "nodeType": "ROOT",
+        "template": null,
+        "variables": [
+          "LAYER_NAME"
+        ]
+      }
+    },
+    {
+      "name": "Styles Sass Default",
+      "layer": "APP",
+      "description": "Inital style files",
+      "rootNode": {
+        "name": "$$layerName$$",
+        "extensionType": null,
+        "nodes": [
+          {
+            "name": "index",
+            "extensionType": "SCSS",
+            "nodes": [],
+            "nodeType": "STYLE",
+            "template": {
+              "value": "@import \"./utils.scss\";",
+              "variables": []
+            },
+            "variables": []
+          },
+          {
+            "name": "utils",
+            "extensionType": "SCSS",
+            "nodes": [],
+            "nodeType": "STYLE",
+            "template": null,
+            "variables": []
+          }
+        ],
+        "nodeType": "ROOT",
+        "template": null,
+        "variables": [
+          "LAYER_NAME"
+        ]
+      }
+    }
+  ],
+  "PAGES": [
+    {
+      "name": "Simple Page",
+      "description": "Simple page with index. model and page files.",
+      "status": "SAVED",
+      "rootNode": {
+        "name": "$$layerName$$",
+        "extensionType": null,
+        "nodes": [
+          {
+            "name": "$$sliceOrSegmentName$$",
+            "extensionType": null,
+            "nodes": [
+              {
+                "name": "index",
+                "extensionType": "JS",
+                "nodes": [],
+                "nodeType": "FILE",
+                "template": {
+                  "value": "export { $$componentName$$ } from './page';",
+                  "variables": [
+                    "COMPONENT_NAME"
+                  ]
+                },
+                "variables": []
+              },
+              {
+                "name": "model",
+                "extensionType": "JS",
+                "nodes": [],
+                "nodeType": "FILE",
+                "template": null,
+                "variables": []
+              },
+              {
+                "name": "page",
+                "extensionType": "JSX",
+                "nodes": [],
+                "nodeType": "FILE",
+                "template": {
+                  "value": "export const $$componentName$$ = () => {\n    return null;\n}",
+                  "variables": [
+                    "COMPONENT_NAME"
+                  ]
+                },
+                "variables": []
+              }
+            ],
+            "nodeType": "FOLDER",
+            "template": null,
+            "variables": [
+              "SLICE_OR_SEGMENT_NAME"
+            ]
+          }
+        ],
+        "nodeType": "ROOT",
+        "template": null,
+        "variables": [
+          "LAYER_NAME"
+        ]
+      }
+    }
+  ],
+  "ENTITIES": [
+    {
+      "name": "Default Full as Files",
+      "layer": "ENTITIES",
+      "description": "Basic entity with:\n- index\n- ui folder\n- model folder\n- lib folder",
+      "rootNode": {
+        "name": "$$layerName$$",
+        "extensionType": null,
+        "nodes": [
+          {
+            "name": "$$sliceOrSegmentName$$",
+            "extensionType": null,
+            "nodes": [
+              {
+                "name": "index",
+                "extensionType": "JS",
+                "nodes": [],
+                "nodeType": "FILE",
+                "template": {
+                  "value": "export { * as $$sliceOrSegmentName$$Model } from \"./model\";\nexport { * as $$sliceOrSegmentName$$Lib } from \"./lib\";\nexport { $$componentName$$ } from './ui';",
+                  "variables": [
+                    "SLICE_OR_SEGMENT_NAME",
+                    "COMPONENT_NAME"
+                  ]
+                },
+                "variables": []
+              },
+              {
+                "name": "lib",
+                "extensionType": "JS",
+                "nodes": [],
+                "nodeType": "FILE",
+                "template": null,
+                "variables": []
+              },
+              {
+                "name": "model",
+                "extensionType": "JS",
+                "nodes": [],
+                "nodeType": "FILE",
+                "template": null,
+                "variables": []
+              },
+              {
+                "name": "ui",
+                "extensionType": "JSX",
+                "nodes": [],
+                "nodeType": "FILE",
+                "template": {
+                  "value": "export const $$componentName$$ = () => {\n    return null;\n}",
+                  "variables": [
+                    "COMPONENT_NAME"
+                  ]
+                },
+                "variables": []
+              }
+            ],
+            "nodeType": "FOLDER",
+            "template": null,
+            "variables": [
+              "SLICE_OR_SEGMENT_NAME"
+            ]
+          }
+        ],
+        "nodeType": "ROOT",
+        "template": null,
+        "variables": [
+          "LAYER_NAME"
+        ]
+      }
+    },
+    {
+      "name": "Default Full as Folders",
+      "layer": "ENTITIES",
+      "description": "Basic entity with:\n- index\n- ui folder\n- model folder\n- lib folder",
+      "rootNode": {
+        "name": "$$layerName$$",
+        "extensionType": null,
+        "nodes": [
+          {
+            "name": "$$sliceOrSegmentName$$",
+            "extensionType": null,
+            "nodes": [
+              {
+                "name": "index",
+                "extensionType": "JS",
+                "nodes": [],
+                "nodeType": "FILE",
+                "template": {
+                  "value": "import * as $$sliceOrSegmentName$$Model from \"./model\";\nimport * as $$sliceOrSegmentName$$Lib from \"./lib\";\n\nexport { $$sliceOrSegmentName$$Model, $$sliceOrSegmentName$$Lib };",
+                  "variables": [
+                    "SLICE_OR_SEGMENT_NAME"
+                  ]
+                },
+                "variables": []
+              },
+              {
+                "name": "ui",
+                "extensionType": null,
+                "nodes": [
+                  {
+                    "name": "index",
+                    "extensionType": "JS",
+                    "nodes": [],
+                    "nodeType": "FILE",
+                    "template": {
+                      "value": "export { $$componentName$$ } from './ui';",
+                      "variables": [
+                        "COMPONENT_NAME"
+                      ]
+                    },
+                    "variables": []
+                  },
+                  {
+                    "name": "$$componentName$$",
+                    "extensionType": null,
+                    "nodes": [
+                      {
+                        "name": "index",
+                        "extensionType": "JSX",
+                        "nodes": [],
+                        "nodeType": "FILE",
+                        "template": {
+                          "value": "import './index.scss';\n\nexport const $$componentName$$ = () => {\n    return null;\n}",
+                          "variables": [
+                            "COMPONENT_NAME"
+                          ]
+                        },
+                        "variables": []
+                      },
+                      {
+                        "name": "index",
+                        "extensionType": "SCSS",
+                        "nodes": [],
+                        "nodeType": "STYLE",
+                        "template": null,
+                        "variables": []
+                      }
+                    ],
+                    "nodeType": "FOLDER",
+                    "template": null,
+                    "variables": [
+                      "COMPONENT_NAME"
+                    ]
+                  }
+                ],
+                "nodeType": "FOLDER",
+                "template": null,
+                "variables": []
+              },
+              {
+                "name": "model",
+                "extensionType": null,
+                "nodes": [
+                  {
+                    "name": "index",
+                    "extensionType": "JS",
+                    "nodes": [],
+                    "nodeType": "FILE",
+                    "template": null,
+                    "variables": []
+                  }
+                ],
+                "nodeType": "FOLDER",
+                "template": null,
+                "variables": []
+              },
+              {
+                "name": "lib",
+                "extensionType": null,
+                "nodes": [
+                  {
+                    "name": "index",
+                    "extensionType": "JS",
+                    "nodes": [],
+                    "nodeType": "FILE",
+                    "template": null,
+                    "variables": []
+                  }
+                ],
+                "nodeType": "FOLDER",
+                "template": null,
+                "variables": []
+              }
+            ],
+            "nodeType": "FOLDER",
+            "template": null,
+            "variables": [
+              "SLICE_OR_SEGMENT_NAME"
+            ]
+          }
+        ],
+        "nodeType": "ROOT",
+        "template": null,
+        "variables": [
+          "LAYER_NAME"
+        ]
+      }
+    }
+  ]
+}

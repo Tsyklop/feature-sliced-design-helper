@@ -1,12 +1,12 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
-<idea-plugin>
+<idea-plugin require-restart="true">
 
     <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
     <id>feature-sliced-design-helper</id>
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-    <name>Feature Slices Design Helper</name>
+    <name>Feature-Sliced Design Helper</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor email="tsyklop@gmail.com" url="https://tsyklop.info">Tsyklop</vendor>
@@ -16,22 +16,44 @@
     <depends>JavaScript</depends>
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.platform</depends>
-
+    
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-        <notificationGroup id="fsd-idea"
+
+        <notificationGroup id="feature-sliced-design-helper-notify-group"
                            key="notification.group"
                            bundle="messages.FSDBundle"
                            displayType="BALLOON"
                            toolWindowId="Project"
         />
+
+        <postStartupActivity implementation="design.featuresliced.helper.platform.ProjectOpenedActivity"/>
+        
+        <projectService serviceImplementation="design.featuresliced.helper.service.ProjectGeneralService"/>
+        <projectService serviceImplementation="design.featuresliced.helper.service.ProjectTemplatesService"/>
+
+        <projectConfigurable id="design.featuresliced.helper.settings.ProjectGeneralConfigurable"
+                             parentId="root"
+                             instance="design.featuresliced.helper.settings.ProjectGeneralConfigurable"
+                             displayName="Feature-Sliced Design"
+                             nonDefaultProject="true">
+        </projectConfigurable>
+
+        <projectConfigurable id="design.featuresliced.helper.settings.ProjectTemplatesConfigurable"
+                             instance="design.featuresliced.helper.settings.ProjectTemplatesConfigurable"
+                             parentId="design.featuresliced.helper.settings.ProjectGeneralConfigurable"
+                             displayName="Templates"
+                             nonDefaultProject="true"/>
+
+        <!--        <treeStructureProvider implementation="design.featuresliced.helper.ProjectTreeStructureWithSortingProvider"/>-->
+
     </extensions>
 
     <actions>
 
         <group id="design.featuresliced.helper.actions.group.FSDActionsGroup"
-               text="Feature Sliced Design"
+               text="Feature-Sliced Design"
                class="design.featuresliced.helper.actions.group.FSDActionsGroup"
                popup="true"
                icon="FSDIcons.MAIN_ICON">
