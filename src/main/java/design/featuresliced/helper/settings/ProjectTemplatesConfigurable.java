@@ -43,7 +43,10 @@ public class ProjectTemplatesConfigurable implements SearchableConfigurable {
 
     @Override
     public boolean isModified() {
-        return this.form.isModified();
+        if (this.form != null) {
+            return this.form.isModified();
+        }
+        return false;
     }
 
     @Override
