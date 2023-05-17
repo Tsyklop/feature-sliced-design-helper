@@ -1,17 +1,13 @@
 package design.featuresliced.helper.gui.form.settings.templates;
 
-import com.intellij.ide.IdeBundle;
-import com.intellij.ide.ReopenProjectAction;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionToolbarPosition;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DetailsComponent;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.openapi.wm.impl.welcomeScreen.RecentProjectPanel;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.OnePixelSplitter;
@@ -20,7 +16,6 @@ import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.components.JBList;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.intellij.util.PathUtil;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.TextTransferable;
 import design.featuresliced.helper.actions.settings.toolbar.TemplatesToolbarCopyAction;
@@ -31,7 +26,6 @@ import design.featuresliced.helper.model.settings.templates.Template;
 import design.featuresliced.helper.model.type.fsd.LayerType;
 import design.featuresliced.helper.model.type.template.TemplateStatusType;
 import design.featuresliced.helper.service.ProjectTemplatesService;
-import org.jetbrains.annotations.SystemIndependent;
 
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
@@ -39,9 +33,8 @@ import javax.swing.event.ListDataListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class TemplatesSettingsForm implements Disposable {
 
@@ -51,9 +44,9 @@ public class TemplatesSettingsForm implements Disposable {
 
     private final DetailsComponent detailsComponent;
 
-    private final java.util.List<Template> newTemplates = new ArrayList<>();
+    private final java.util.List<Template> newTemplates = new CopyOnWriteArrayList<>();
 
-    private final java.util.List<Template> removedTemplates = new ArrayList<>();
+    private final java.util.List<Template> removedTemplates = new CopyOnWriteArrayList<>();
 
     private final ProjectTemplatesService projectTemplatesService;
 
